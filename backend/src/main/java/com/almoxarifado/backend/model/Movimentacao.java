@@ -6,7 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
-import java.time.OffsetDateTime;
+import java.util.Date;
 
 // Indica que esta classe representa uma entidade do banco de dados.
 @Entity
@@ -30,7 +30,7 @@ public class Movimentacao {
     private Long usuarioId;
 
     // Define se a movimentação é uma entrada ou uma saída de estoque.
-    @Column(nullable = false)
+    @Column()
     private String tipo;
 
     // Quantidade de itens movimentados.
@@ -42,7 +42,7 @@ public class Movimentacao {
 
     // Data e hora em que a movimentação foi realizada.
     @Column(name = "data_movimentacao")
-    private OffsetDateTime dataMovimentacao;
+    private Date dataMovimentacao;
 
     // Construtor vazio exigido pelo JPA
     public Movimentacao() {
@@ -51,7 +51,7 @@ public class Movimentacao {
 
 // Construtor usado para criar uma nova movimentação
 public Movimentacao(Long produtoId, Long usuarioId, String tipo, Long quantidade, String observacao,
-        OffsetDateTime dataMovimentacao) {
+        Date dataMovimentacao) {
 
     this.produtoId = produtoId;
     this.usuarioId = usuarioId;
@@ -109,11 +109,11 @@ public Movimentacao(Long produtoId, Long usuarioId, String tipo, Long quantidade
         this.observacao = observacao;
     }
 
-    public OffsetDateTime getDataMovimentacao() {
+    public Date getDataMovimentacao() {
         return dataMovimentacao;
     }
 
-    public void setDataMovimentacao(OffsetDateTime dataMovimentacao) {
+    public void setDataMovimentacao(Date dataMovimentacao) {
         this.dataMovimentacao = dataMovimentacao;
     }
 

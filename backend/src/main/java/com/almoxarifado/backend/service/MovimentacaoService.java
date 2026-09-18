@@ -7,7 +7,8 @@ import com.almoxarifado.backend.model.Movimentacao;
 import com.almoxarifado.backend.model.Produto;
 import com.almoxarifado.backend.repository.MovimentacaoRepository;
 import com.almoxarifado.backend.repository.ProdutoRepository;
-import java.time.OffsetDateTime;
+
+import java.util.Date;
 import java.util.List;
 
 // Aqui são as regras de negocio das movimentações.
@@ -66,7 +67,7 @@ public class MovimentacaoService {
 }
 
 // Registra a data e hora atual da movimentação.
-movimentacao.setDataMovimentacao(OffsetDateTime.now());
+movimentacao.setDataMovimentacao(new Date());
 
 produtoRepository.save(produto);
 

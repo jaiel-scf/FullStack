@@ -29,13 +29,13 @@ public class MovimentacaoController {
 }
 
 // Retorna todas as movimentações cadastradas
-@GetMapping
+@GetMapping("/listar")
 public List<Movimentacao> listarTodos() {
     return movimentacaoService.listarTodos();
 }
 
 // Registra uma nova movimentação de entrada ou saída
-@PostMapping
+@PostMapping("/registrar")
 public Movimentacao registrar(@RequestBody Movimentacao movimentacao) {
     return movimentacaoService.registrar(movimentacao);
 }

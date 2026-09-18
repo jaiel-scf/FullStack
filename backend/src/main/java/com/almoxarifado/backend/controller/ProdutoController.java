@@ -26,13 +26,13 @@ public class ProdutoController {
     }
 
     // Retorna todos os produtos cadastrados.
-    @GetMapping 
+    @GetMapping("/listar")
     public List<Produto> listaProdutos() {
         return produtoService.listarTodos();
     }
 
     // Cadastrar um novo produto.
-    @PostMapping 
+    @PostMapping ("/registrar")
     public Produto cadastrar(@RequestBody Produto produto) {
         return produtoService.salvar(produto);
     }
