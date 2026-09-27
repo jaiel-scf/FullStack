@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Requisições - Sistema de Almoxarifado</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- CSS próprio do projeto -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="bg-slate-100">
+
+    <div class="min-h-screen flex">
+
+        <!-- Menu lateral -->
+        <aside class="w-64 bg-blue-800 text-white p-6 flex flex-col">
+
+            <div class="flex items-center gap-3 mb-10">
+
+                <img src="assets/icons/blocks.svg" alt="Ícone do sistema" class="w-8 h-8">
+
+                <h1 class="text-lg font-bold">
+                    SIA
+                </h1>
+
+            </div>
+
+            <nav class="space-y-3">
+
+                <!-- Voi para Estoque -->
+                <a href="./estoque.html"
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
+                    <img src="assets/icons/package-plus.svg" alt="" class="w-5 h-5">
+
+                    <span>Estoque</span>
+                </a>
+
+                <!-- Vai para Requisições  -->
+                <a href="./requisicoes.html" class="flex items-center gap-3 bg-blue-700 px-4 py-3 rounded-lg">
+                    <img src="assets/icons/clipboard-list.svg" alt="" class="w-5 h-5">
+
+                    <span>Requisições</span>
+                </a>
+
+                <!-- Vai para Entrada -->
+                <a href="./entrada.html"
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
+                    <img src="assets/icons/package-plus.svg" alt="" class="w-5 h-5">
+
+                    <span>Entrada</span>
+                </a>
+
+                <!-- Usuários - visível somente para administrador -->
+                <a href="./usuarios.html" id="menuUsuarios"
+                    class="hidden flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
+                    <img src="assets/icons/house-plus.svg" alt="" class="w-5 h-5">
+
+                    <span>Usuários</span>
+                </a>
+
+            </nav>
+            <a href="login.html" id="botaoSair"
+                class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition mt-auto">
+
+                <img src="assets/icons/log-out.svg" alt="" class="w-5 h-5">
+
+                <span>Sair</span>
+            </a>
+
+        </aside>
+
+
+        <!-- Área principal -->
+        <div class="flex-1 flex flex-col">
+
+            <main class="flex-1 p-8">
+
+                <!-- Título da página -->
+                <div class="mb-8">
+
+                    <h2 class="text-3xl font-bold text-slate-800">
+                        Requisições
+                    </h2>
+
+                    <p class="text-slate-500 mt-1">
+                        Solicite materiais disponíveis no almoxarifado.
+                    </p>
+
+                </div>
+
+
+                <!-- Formulário para requisição -->
+                <section class="bg-slate-50 rounded-xl shadow-md p-6 max-w-2xl">
+
+                    <h3 class="text-xl font-semibold text-slate-800 mb-6">
+                        Nova requisição
+                    </h3>
+
+                    <form id="formRequisicao">
+
+                        <!-- Mnome do produto -->
+                        <div class="mb-5">
+
+                            <label for="material" class="block text-sm font-medium text-slate-700 mb-2">
+                                Material
+                            </label>
+
+                            <select id="material"
+                                class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-blue-500">
+
+                                <option value="">
+                                    Selecione um material
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- quantidade do produto-->
+                        <div class="mb-5">
+
+                            <label for="quantidade" class="block text-sm font-medium text-slate-700 mb-2">
+                                Quantidade
+                            </label>
+
+                            <input type="number" id="quantidade" min="1" placeholder="Digite a quantidade"
+                                class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-blue-500">
+
+                        </div>
+
+
+                        <!-- observações sobre o produto-->
+                        <div class="mb-6">
+
+                            <label for="observacao" class="block text-sm font-medium text-slate-700 mb-2">
+                                Observação
+                            </label>
+
+                            <textarea id="observacao" rows="4" placeholder="Digite uma observação, se necessário"
+                                class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-blue-500 resize-none"></textarea>
+
+                        </div>
+
+
+                        <!-- botão para enviar requisição -->
+                        <button type="submit"
+                            class="flex items-center justify-center gap-2 bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+
+                            <img src="assets/icons/send.svg" alt="" class="w-5 h-5">
+                            Enviar requisição
+                        </button>
+
+                        <p id="mensagemRequisicao" class="text-sm mt-4"></p>
+
+                    </form>
+
+                </section>
+
+            </main>
+
+
+            <!-- Rodapé -->
+            <footer class="bg-slate-200 text-slate-600 text-sm text-center py-4">
+                Sistema de Almoxarifado • 2026
+            </footer>
+
+        </div>
+
+    </div>
+
+    <script src="js/requisicoes.js"></script>
+    <script>
+        const botaoSair = document.getElementById("botaoSair");
+
+        botaoSair.addEventListener("click", function (event) {
+
+            event.preventDefault();
+
+            sessionStorage.removeItem("token");
+            sessionStorage.removeItem("usuarioId");
+            sessionStorage.removeItem("usuarioNome");
+            sessionStorage.removeItem("usuarioPerfil");
+
+            window.location.href = "login.html?logout=1";
+        });
+    </script>
+
+</body>
+
+</html>

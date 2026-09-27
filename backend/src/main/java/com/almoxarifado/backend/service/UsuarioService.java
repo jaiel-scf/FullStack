@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.almoxarifado.backend.repository.UsuarioRepository;
+import java.util.List;
 
 // Contém as regras de negócio relacionadas aos usuários
 @Service
@@ -22,46 +23,99 @@ public class UsuarioService {
     }
 
     // Verifica se o email e a senha informados pertencem a um usuário válido
-public Usuario autenticar(String email, String senha) {
+    public Usuario autenticar(String email, String senha) {
 
-    // Busca o usuário pelo email informado
-    Usuario usuario = usuarioRepository.findByEmail(email)
-        .orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.UNAUTHORIZED,
-                "Email ou senha inválidos"
-        ));
+        // Busca o usuário pelo email informado
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Email ou senha inválidos"));
 
-    // Impede o acesso de usuários desativados
-    if (Boolean.FALSE.equals(usuario.getAtivo())) {
-        throw new RuntimeException("Usuário inativo");
+        // Impede o acesso de usuários desativados
+        if (Boolean.FALSE.equals(usuario.getAtivo())) {
+            throw new RuntimeException("Usuário inativo");
+        }
+
+        // Verifica se o usuário já possui uma senha cadastrada
+        if (usuario.getSenhaHash() == null || usuario.getSenhaHash().isBlank()) {
+            throw new RuntimeException("Usuário ainda não possui senha cadastrada");
+        }
+
+        // Compara a senha digitada com o hash armazenado no banco
+        if (!passwordEncoder.matches(senha, usuario.getSenhaHash())) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Email ou senha inválidos");
+        }
+
+        return usuario;
     }
 
-    // Verifica se o usuário já possui uma senha cadastrada
-    if (usuario.getSenhaHash() == null || usuario.getSenhaHash().isBlank()) {
-        throw new RuntimeException("Usuário ainda não possui senha cadastrada");
+    // Define uma nova senha para um usuário e salva somente o hash no banco
+    public Usuario definirSenha(Long id, String senha) {
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        String senhaHash = passwordEncoder.encode(senha);
+
+        usuario.setSenhaHash(senhaHash);
+
+        return usuarioRepository.save(usuario);
     }
 
-    // Compara a senha digitada com o hash armazenado no banco
-    if (!passwordEncoder.matches(senha, usuario.getSenhaHash())) {
-    throw new ResponseStatusException(
-            HttpStatus.UNAUTHORIZED,
-            "Email ou senha inválidos"
-    );
-}
+    // Cadastra um novo usuário com a senha protegida por BCrypt
+    public Usuario cadastrarUsuario(
+            String nome,
+            String email,
+            String senha,
+            String perfil) {
 
-    return usuario;
-}
+        // Não permite dois usuários com o mesmo e-mail
+        if (usuarioRepository.findByEmail(email).isPresent()) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Já existe um usuário com este e-mail");
+        }
 
-// Define uma nova senha para um usuário e salva somente o hash no banco
-public Usuario definirSenha(Long id, String senha) {
+        // Aceita somente os perfis usados pelo sistema
+        if (!perfil.equals("admin") && !perfil.equals("usuario")) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Perfil inválido");
+        }
 
-    Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        Usuario usuario = new Usuario();
 
-    String senhaHash = passwordEncoder.encode(senha);
+        usuario.setNome(nome);
+        usuario.setEmail(email);
 
-    usuario.setSenhaHash(senhaHash);
+        // Protege a senha antes de salvar no banco
+        usuario.setSenhaHash(passwordEncoder.encode(senha));
 
-    return usuarioRepository.save(usuario);
-}
+        // Perfil escolhido pelo administrador
+        usuario.setPerfil(perfil);
+
+        // Todo novo usuário começa ativo
+        usuario.setAtivo(true);
+
+        return usuarioRepository.save(usuario);
+    }
+
+    // Lista todos os usuários cadastrados
+    public List<Usuario> listarTodos() {
+        return usuarioRepository.findAll();
+    }
+
+    // Exclui um usuário pelo ID
+    public void excluirUsuario(Long id) {
+
+        if (!usuarioRepository.existsById(id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Usuário não encontrado");
+        }
+
+        usuarioRepository.deleteById(id);
+    }
 }
