@@ -16,13 +16,16 @@ if (!token) {
 // Busca os usuários cadastrados no backend
 async function carregarUsuarios() {
   try {
-    const resposta = await fetch("https://fullstack-production-d62d.up.railway.app/usuarios/listar", {
-      method: "GET",
+    const resposta = await fetch(
+      "https://fullstack-production-d62d.up.railway.app/usuarios/listar",
+      {
+        method: "GET",
 
-      headers: {
-        Authorization: `Bearer ${token}`,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    });
+    );
 
     if (!resposta.ok) {
       throw new Error("Não foi possível carregar os usuários.");
@@ -30,9 +33,14 @@ async function carregarUsuarios() {
 
     const usuarios = await resposta.json();
 
+    // Mostra somente os usuários ativos
+    const usuariosAtivos = usuarios.filter(function (usuario) {
+      return usuario.ativo;
+    });
+
     tabelaUsuarios.innerHTML = "";
 
-    usuarios.forEach(function (usuario) {
+    usuariosAtivos.forEach(function (usuario) {
       const linha = document.createElement("tr");
 
       linha.className = "hover:bg-slate-100 transition";
@@ -120,21 +128,24 @@ formUsuario.addEventListener("submit", async function (event) {
   mensagemUsuario.className = "text-sm mt-4 text-slate-500";
 
   try {
-    const resposta = await fetch("https://fullstack-production-d62d.up.railway.app/usuarios/registrar", {
-      method: "POST",
+    const resposta = await fetch(
+      "https://fullstack-production-d62d.up.railway.app/usuarios/registrar",
+      {
+        method: "POST",
 
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+
+        body: JSON.stringify({
+          nome: nome,
+          email: email,
+          senha: senha,
+          perfil: perfil,
+        }),
       },
-
-      body: JSON.stringify({
-        nome: nome,
-        email: email,
-        senha: senha,
-        perfil: perfil,
-      }),
-    });
+    );
 
     if (!resposta.ok) {
       const erroBackend = await resposta.text();

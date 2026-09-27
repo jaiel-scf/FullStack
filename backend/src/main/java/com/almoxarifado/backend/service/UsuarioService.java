@@ -107,15 +107,16 @@ public class UsuarioService {
         return usuarioRepository.findAll();
     }
 
-    // Exclui um usuário pelo ID
+    // Desativa o usuário sem apagar seu histórico do sistema
     public void excluirUsuario(Long id) {
 
-        if (!usuarioRepository.existsById(id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Usuário não encontrado");
-        }
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Usuário não encontrado"));
 
-        usuarioRepository.deleteById(id);
+        usuario.setAtivo(false);
+
+        usuarioRepository.save(usuario);
     }
 }
