@@ -44,7 +44,7 @@ formLogin.addEventListener("submit", async function (event) {
   mensagemLogin.className = "text-sm text-center mt-4 text-gray-500";
 
   try {
-    const resposta = await fetch("http://localhost:8080/auth/login", {
+    const resposta = await fetch("https://fullstack-production-d62d.up.railway.app/auth/login", {
       method: "POST",
 
       headers: {

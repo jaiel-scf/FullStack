@@ -44,7 +44,7 @@ if (!token) {
 // Busca os produtos existentes no backend
 async function carregarProdutosEntrada() {
   try {
-    const resposta = await fetch("http://localhost:8080/produtos/listar", {
+    const resposta = await fetch("https://fullstack-production-d62d.up.railway.app/produtos/listar", {
       method: "GET",
 
       headers: {
@@ -129,7 +129,7 @@ formNovoProduto.addEventListener("submit", async function (event) {
   mensagemNovoProduto.className = "text-sm mt-4 text-slate-500";
 
   try {
-    const resposta = await fetch("http://localhost:8080/produtos/registrar", {
+    const resposta = await fetch("https://fullstack-production-d62d.up.railway.app/produtos/registrar", {
       method: "POST",
 
       headers: {
@@ -215,7 +215,7 @@ formEntrada.addEventListener("submit", async function (event) {
 
   try {
     const resposta = await fetch(
-      "http://localhost:8080/movimentacoes/registrar",
+      "https://fullstack-production-d62d.up.railway.app/movimentacoes/registrar",
       {
         method: "POST",
 

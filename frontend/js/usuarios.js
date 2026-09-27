@@ -16,7 +16,7 @@ if (!token) {
 // Busca os usuários cadastrados no backend
 async function carregarUsuarios() {
   try {
-    const resposta = await fetch("http://localhost:8080/usuarios/listar", {
+    const resposta = await fetch("https://fullstack-production-d62d.up.railway.app/usuarios/listar", {
       method: "GET",
 
       headers: {
@@ -120,7 +120,7 @@ formUsuario.addEventListener("submit", async function (event) {
   mensagemUsuario.className = "text-sm mt-4 text-slate-500";
 
   try {
-    const resposta = await fetch("http://localhost:8080/usuarios/registrar", {
+    const resposta = await fetch("https://fullstack-production-d62d.up.railway.app/usuarios/registrar", {
       method: "POST",
 
       headers: {
@@ -198,7 +198,7 @@ confirmarExclusao.addEventListener("click", async function () {
 
   try {
     const resposta = await fetch(
-      `http://localhost:8080/usuarios/${usuarioParaExcluir}`,
+      `https://fullstack-production-d62d.up.railway.app/usuarios/${usuarioParaExcluir}`,
       {
         method: "DELETE",
 

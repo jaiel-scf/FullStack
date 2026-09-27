@@ -23,7 +23,7 @@ if (!token) {
 // busca os produtos no backend e atualizando quando for retirado do estoque.
 async function carregarMateriais() {
   try {
-    const resposta = await fetch("http://localhost:8080/produtos/listar", {
+    const resposta = await fetch("https://fullstack-production-d62d.up.railway.app/produtos/listar", {
       method: "GET",
 
       headers: {
@@ -90,7 +90,7 @@ formRequisicao.addEventListener("submit", async function (event) {
 
   try {
     const resposta = await fetch(
-      "http://localhost:8080/movimentacoes/registrar",
+      "https://fullstack-production-d62d.up.railway.app/movimentacoes/registrar",
       {
         method: "POST",
 
@@ -126,7 +126,7 @@ formRequisicao.addEventListener("submit", async function (event) {
 
     // Atualiza as quantidades disponíveis
     await carregarMateriais();
-    
+
   } catch (erro) {
     mensagemRequisicao.textContent = "Não foi possível conectar ao servidor.";
 

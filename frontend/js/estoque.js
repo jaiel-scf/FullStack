@@ -23,7 +23,7 @@ if (!token) {
 // Busca os produtos no backend
 async function carregarProdutos() {
   try {
-    const resposta = await fetch("http://localhost:8080/produtos/listar", {
+    const resposta = await fetch("https://fullstack-production-d62d.up.railway.app/produtos/listar", {
       method: "GET",
 
       headers: {
