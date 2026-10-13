@@ -1,3 +1,4 @@
+
 package com.almoxarifado.backend.service;
 
 import com.almoxarifado.backend.model.Usuario;
@@ -147,9 +148,9 @@ public class UsuarioService {
                 // Gera um token temporário
                 String token = UUID.randomUUID().toString();
 
-                // O link expira em 30 minutos
+                // O link expira em 3 minutos
                 Instant expiracao = Instant.now().plus(
-                                30, ChronoUnit.MINUTES);
+                                3, ChronoUnit.MINUTES);
 
                 usuario.setTokenRedefinicao(token);
                 usuario.setTokenExpiraEm(expiracao);
