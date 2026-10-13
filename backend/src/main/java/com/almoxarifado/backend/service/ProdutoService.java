@@ -1,38 +1,71 @@
 package com.almoxarifado.backend.service;
 
-import org.springframework.stereotype.Service;
-import com.almoxarifado.backend.repository.ProdutoRepository;
 import java.util.List;
-import com.almoxarifado.backend.model.Produto;
 import java.util.Optional;
 
-// Essa classe dá as regras de negócio de Produto.
-@Service 
+import org.springframework.stereotype.Service;
 
-// Aqui recebe o repositorio que será usado p/ acessar os produtos no banco.
+import com.almoxarifado.backend.model.Produto;
+import com.almoxarifado.backend.repository.ProdutoRepository;
+
+// Regras de negócio de Produto
+@Service
 public class ProdutoService {
+
     private final ProdutoRepository produtoRepository;
-    public ProdutoService (ProdutoRepository produtoRepository){
+
+    public ProdutoService(ProdutoRepository produtoRepository) {
         this.produtoRepository = produtoRepository;
     }
 
-    // Aqui faz a busca de todos os produtos cadastrados no banco.
+    // Lista somente produtos ativos
     public List<Produto> listarTodos() {
-        return produtoRepository.findAll();
+        return produtoRepository.findAll()
+                .stream()
+                .filter(produto -> produto.getAtivo() == null || produto.getAtivo())
+                .toList();
     }
 
-    // Aqui salva um produto no banco de dados.
+    // Salva um produto
     public Produto salvar(Produto produto) {
+
+        // Produto novo entra ativo
+        if (produto.getAtivo() == null) {
+            produto.setAtivo(true);
+        }
+
         return produtoRepository.save(produto);
     }
 
-    // Aqui fazemos a busca do produto pelo ID.
-    public  Optional<Produto> buscaPorId(Long id) {
+    // Busca produto pelo ID
+    public Optional<Produto> buscaPorId(Long id) {
         return produtoRepository.findById(id);
     }
 
-    // Aqui vamos excluir um produto pelo ID.
-    public void excluir(Long id) {
-        produtoRepository.deleteById(id);
+    // Edita um produto
+    public Produto editar(Long id, Produto dadosProduto) {
+
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
+
+        produto.setNome(dadosProduto.getNome());
+        produto.setCodigo(dadosProduto.getCodigo());
+        produto.setDescricao(dadosProduto.getDescricao());
+        produto.setLocalizacao(dadosProduto.getLocalizacao());
+        produto.setUnidadeMedida(dadosProduto.getUnidadeMedida());
+        produto.setEstoqueMinimo(dadosProduto.getEstoqueMinimo());
+
+        return produtoRepository.save(produto);
+    }
+
+    // Inativa um produto
+    public Produto inativar(Long id) {
+
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
+
+        produto.setAtivo(false);
+
+        return produtoRepository.save(produto);
     }
 }

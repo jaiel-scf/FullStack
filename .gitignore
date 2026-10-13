@@ -1,0 +1,24 @@
+
+# Arquivos temporários do Expo
+.expo/
+
+# Dependências do Node
+node_modules/
+
+# Compilação do Java
+target/
+
+# Configurações locais e credenciais
+.env
+.env.*
+!.env.example
+
+# Arquivos do editor
+.vscode/
+.idea/
+
+# Arquivos temporários
+*.log
+*.tmp
+.DS_Store
+Thumbs.db

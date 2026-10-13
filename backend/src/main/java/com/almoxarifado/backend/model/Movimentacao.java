@@ -1,65 +1,80 @@
 package com.almoxarifado.backend.model;
 
+import java.util.Date;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import java.util.Date;
 
-// Indica que esta classe representa uma entidade do banco de dados.
+// Entidade que representa as movimentações do sistema
 @Entity
-
-// Define que esta classe está ligada à tabela movimentacoes.
 @Table(name = "movimentacoes")
-
 public class Movimentacao {
 
-    // Identificador único automatico da movimentação.
+    // Identificador único da movimentação
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // ID do produto relacionado à movimentação.
-    @Column(name = "produto_id", nullable = false)
+    // Produto relacionado à movimentação
+    @Column(name = "produto_id")
     private Long produtoId;
 
-    // ID do usuário que realizou a movimentação.
-    @Column(name = "usuario_id", nullable = false)
+    // Usuário relacionado à movimentação
+    @Column(name = "usuario_id")
     private Long usuarioId;
 
-    // Define se a movimentação é uma entrada ou uma saída de estoque.
-    @Column()
+    // Tipo da movimentação
+    @Column(name = "tipo")
     private String tipo;
 
-    // Quantidade de itens movimentados.
-    @Column(nullable = false)
+    // Quantidade movimentada
+    @Column(name = "quantidade")
     private Long quantidade;
 
-    // Observação opcional sobre a movimentação.
-    private String observacao;
-
-    // Data e hora em que a movimentação foi realizada.
+    // Data em que a movimentação foi criada
     @Column(name = "data_movimentacao")
     private Date dataMovimentacao;
 
-    // Construtor vazio exigido pelo JPA
+    // Observação da movimentação
+    @Column(name = "observacao")
+    private String observacao;
+
+    // Código da requisição
+    @Column(name = "codigo")
+    private String codigo;
+
+    // Status atual da requisição
+    @Column(name = "status")
+    private String status;
+
+    // Data da última atualização
+    @Column(name = "data_atualizada")
+    private Date dataAtualizada;
+
+    // Construtor vazio usado pelo JPA
     public Movimentacao() {
-        
     }
 
-// Construtor usado para criar uma nova movimentação
-public Movimentacao(Long produtoId, Long usuarioId, String tipo, Long quantidade, String observacao,
-        Date dataMovimentacao) {
+    // Construtor para criar uma movimentação
+    public Movimentacao(
+            Long produtoId,
+            Long usuarioId,
+            String tipo,
+            Long quantidade,
+            Date dataMovimentacao,
+            String observacao) {
 
-    this.produtoId = produtoId;
-    this.usuarioId = usuarioId;
-    this.tipo = tipo;
-    this.quantidade = quantidade;
-    this.observacao = observacao;
-    this.dataMovimentacao = dataMovimentacao;
-}
+        this.produtoId = produtoId;
+        this.usuarioId = usuarioId;
+        this.tipo = tipo;
+        this.quantidade = quantidade;
+        this.dataMovimentacao = dataMovimentacao;
+        this.observacao = observacao;
+    }
 
     public Long getId() {
         return id;
@@ -101,14 +116,6 @@ public Movimentacao(Long produtoId, Long usuarioId, String tipo, Long quantidade
         this.quantidade = quantidade;
     }
 
-    public String getObservacao() {
-        return observacao;
-    }
-
-    public void setObservacao(String observacao) {
-        this.observacao = observacao;
-    }
-
     public Date getDataMovimentacao() {
         return dataMovimentacao;
     }
@@ -117,5 +124,35 @@ public Movimentacao(Long produtoId, Long usuarioId, String tipo, Long quantidade
         this.dataMovimentacao = dataMovimentacao;
     }
 
-    
+    public String getObservacao() {
+        return observacao;
+    }
+
+    public void setObservacao(String observacao) {
+        this.observacao = observacao;
+    }
+
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Date getDataAtualizada() {
+        return dataAtualizada;
+    }
+
+    public void setDataAtualizada(Date dataAtualizada) {
+        this.dataAtualizada = dataAtualizada;
+    }
 }

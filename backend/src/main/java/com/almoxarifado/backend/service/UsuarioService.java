@@ -1,122 +1,324 @@
 package com.almoxarifado.backend.service;
 
 import com.almoxarifado.backend.model.Usuario;
+import com.almoxarifado.backend.repository.UsuarioRepository;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.almoxarifado.backend.repository.UsuarioRepository;
-import java.util.List;
-
-// Contém as regras de negócio relacionadas aos usuários
+// Regras relacionadas aos usuários
 @Service
 public class UsuarioService {
 
-    private final UsuarioRepository usuarioRepository;
-    private final PasswordEncoder passwordEncoder;
+        private final UsuarioRepository usuarioRepository;
+        private final PasswordEncoder passwordEncoder;
+        private final EmailService emailService;
 
-    // Recebe o repositório de usuários e o responsável pela proteção das senhas
-    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
-        this.usuarioRepository = usuarioRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+        public UsuarioService(
+                        UsuarioRepository usuarioRepository,
+                        PasswordEncoder passwordEncoder,
+                        EmailService emailService) {
 
-    // Verifica se o email e a senha informados pertencem a um usuário válido
-    public Usuario autenticar(String email, String senha) {
-
-        // Busca o usuário pelo email informado
-        Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.UNAUTHORIZED,
-                        "Email ou senha inválidos"));
-
-        // Impede o acesso de usuários desativados
-        if (Boolean.FALSE.equals(usuario.getAtivo())) {
-            throw new RuntimeException("Usuário inativo");
+                this.usuarioRepository = usuarioRepository;
+                this.passwordEncoder = passwordEncoder;
+                this.emailService = emailService;
         }
 
-        // Verifica se o usuário já possui uma senha cadastrada
-        if (usuario.getSenhaHash() == null || usuario.getSenhaHash().isBlank()) {
-            throw new RuntimeException("Usuário ainda não possui senha cadastrada");
+        // Faz a autenticação do usuário
+        public Usuario autenticar(String email, String senha) {
+
+                String emailTratado = email.trim().toLowerCase();
+
+                Usuario usuario = usuarioRepository.findByEmail(emailTratado)
+                                .orElseThrow(() -> new ResponseStatusException(
+                                                HttpStatus.UNAUTHORIZED,
+                                                "Email ou senha inválidos"));
+
+                if (Boolean.FALSE.equals(usuario.getAtivo())) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.FORBIDDEN,
+                                        "Usuário inativo");
+                }
+
+                if (usuario.getSenhaHash() == null
+                                || usuario.getSenhaHash().isBlank()) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.UNAUTHORIZED,
+                                        "Usuário ainda não possui senha cadastrada");
+                }
+
+                if (!passwordEncoder.matches(senha, usuario.getSenhaHash())) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.UNAUTHORIZED,
+                                        "Email ou senha inválidos");
+                }
+
+                return usuario;
         }
 
-        // Compara a senha digitada com o hash armazenado no banco
-        if (!passwordEncoder.matches(senha, usuario.getSenhaHash())) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "Email ou senha inválidos");
+        // Define uma nova senha
+        public Usuario definirSenha(Long id, String senha) {
+
+                Usuario usuario = usuarioRepository.findById(id)
+                                .orElseThrow(() -> new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND,
+                                                "Usuário não encontrado"));
+
+                usuario.setSenhaHash(passwordEncoder.encode(senha));
+
+                return usuarioRepository.save(usuario);
         }
 
-        return usuario;
-    }
+        // Altera a senha no primeiro acesso
+        // A senha padrão já foi conferida no login inicial
+        public void alterarSenhaPrimeiroAcesso(
+                        Long id,
+                        String novaSenha) {
 
-    // Define uma nova senha para um usuário e salva somente o hash no banco
-    public Usuario definirSenha(Long id, String senha) {
+                Usuario usuario = usuarioRepository.findById(id)
+                                .orElseThrow(() -> new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND,
+                                                "Usuário não encontrado"));
 
-        Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                if (!Boolean.TRUE.equals(usuario.getAtivo())) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.FORBIDDEN,
+                                        "Usuário inativo");
+                }
 
-        String senhaHash = passwordEncoder.encode(senha);
+                // Somente usuários no primeiro acesso podem usar essa rota
+                if (!Boolean.TRUE.equals(usuario.getPrimeiroAcesso())) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.FORBIDDEN,
+                                        "Primeiro acesso já concluído");
+                }
 
-        usuario.setSenhaHash(senhaHash);
+                validarNovaSenha(novaSenha);
 
-        return usuarioRepository.save(usuario);
-    }
+                // Impede reutilizar a senha padrão
+                if (usuario.getSenhaHash() != null
+                                && passwordEncoder.matches(
+                                                novaSenha, usuario.getSenhaHash())) {
 
-    // Cadastra um novo usuário com a senha protegida por BCrypt
-    public Usuario cadastrarUsuario(
-            String nome,
-            String email,
-            String senha,
-            String perfil) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "A nova senha deve ser diferente da senha inicial");
+                }
 
-        // Não permite dois usuários com o mesmo e-mail
-        if (usuarioRepository.findByEmail(email).isPresent()) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Já existe um usuário com este e-mail");
+                // Salva a senha criptografada
+                usuario.setSenhaHash(passwordEncoder.encode(novaSenha));
+
+                // Marca o primeiro acesso como concluído
+                usuario.setPrimeiroAcesso(false);
+
+                usuarioRepository.save(usuario);
         }
 
-        // Aceita somente os perfis usados pelo sistema
-        if (!perfil.equals("admin") && !perfil.equals("usuario")) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Perfil inválido");
+        // Solicita recuperação de senha por e-mail
+        public void solicitarRedefinicaoSenha(String email) {
+
+                if (email == null || email.isBlank()) {
+                        return;
+                }
+
+                String emailTratado = email.trim().toLowerCase();
+
+                Optional<Usuario> usuarioEncontrado = usuarioRepository.findByEmail(emailTratado);
+
+                // Não revela se o e-mail está cadastrado
+                if (usuarioEncontrado.isEmpty()) {
+                        return;
+                }
+
+                Usuario usuario = usuarioEncontrado.get();
+
+                if (Boolean.FALSE.equals(usuario.getAtivo())) {
+                        return;
+                }
+
+                // Gera um token temporário
+                String token = UUID.randomUUID().toString();
+
+                // O link expira em 30 minutos
+                Instant expiracao = Instant.now().plus(
+                                30, ChronoUnit.MINUTES);
+
+                usuario.setTokenRedefinicao(token);
+                usuario.setTokenExpiraEm(expiracao);
+
+                usuarioRepository.save(usuario);
+
+                // Envia o e-mail
+                emailService.enviarEmailRedefinicao(
+                                usuario.getEmail(),
+                                usuario.getNome(),
+                                token);
         }
 
-        Usuario usuario = new Usuario();
+        // Redefine a senha pelo link recebido no e-mail
+        public void redefinirSenhaPorToken(
+                        String token,
+                        String novaSenha) {
 
-        usuario.setNome(nome);
-        usuario.setEmail(email);
+                if (token == null || token.isBlank()) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "Token inválido");
+                }
 
-        // Protege a senha antes de salvar no banco
-        usuario.setSenhaHash(passwordEncoder.encode(senha));
+                Usuario usuario = usuarioRepository
+                                .findByTokenRedefinicao(token)
+                                .orElseThrow(() -> new ResponseStatusException(
+                                                HttpStatus.BAD_REQUEST,
+                                                "Link de redefinição inválido"));
 
-        // Perfil escolhido pelo administrador
-        usuario.setPerfil(perfil);
+                if (Boolean.FALSE.equals(usuario.getAtivo())) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.FORBIDDEN,
+                                        "Usuário inativo");
+                }
 
-        // Todo novo usuário começa ativo
-        usuario.setAtivo(true);
+                if (usuario.getTokenExpiraEm() == null
+                                || usuario.getTokenExpiraEm().isBefore(Instant.now())) {
 
-        return usuarioRepository.save(usuario);
-    }
+                        limparTokenRedefinicao(usuario);
 
-    // Lista todos os usuários cadastrados
-    public List<Usuario> listarTodos() {
-        return usuarioRepository.findAll();
-    }
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "O link de redefinição expirou");
+                }
 
-    // Desativa o usuário sem apagar seu histórico do sistema
-    public void excluirUsuario(Long id) {
+                validarNovaSenha(novaSenha);
 
-        Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Usuário não encontrado"));
+                // Impede utilizar a mesma senha
+                if (usuario.getSenhaHash() != null
+                                && passwordEncoder.matches(
+                                                novaSenha, usuario.getSenhaHash())) {
 
-        usuario.setAtivo(false);
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "A nova senha deve ser diferente da senha atual");
+                }
 
-        usuarioRepository.save(usuario);
-    }
+                usuario.setSenhaHash(passwordEncoder.encode(novaSenha));
+
+                // Recuperação por e-mail também conclui primeiro acesso
+                usuario.setPrimeiroAcesso(false);
+
+                // Impede reutilização do link
+                usuario.setTokenRedefinicao(null);
+                usuario.setTokenExpiraEm(null);
+
+                usuarioRepository.save(usuario);
+        }
+
+        // Valida a nova senha
+        private void validarNovaSenha(String novaSenha) {
+
+                if (novaSenha == null || novaSenha.isBlank()) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "Informe a nova senha");
+                }
+
+                if (novaSenha.length() < 6) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "A senha deve possuir pelo menos 6 caracteres");
+                }
+        }
+
+        // Limpa token de recuperação
+        private void limparTokenRedefinicao(Usuario usuario) {
+
+                usuario.setTokenRedefinicao(null);
+                usuario.setTokenExpiraEm(null);
+
+                usuarioRepository.save(usuario);
+        }
+
+        // Cadastra ou reativa um usuário
+        public Usuario cadastrarUsuario(
+                        String nome,
+                        String email,
+                        String senha,
+                        String perfil) {
+
+                if (!"admin".equals(perfil)
+                                && !"usuario".equals(perfil)) {
+
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "Perfil inválido");
+                }
+
+                String emailTratado = email.trim().toLowerCase();
+
+                Optional<Usuario> usuarioExistente = usuarioRepository.findByEmail(emailTratado);
+
+                if (usuarioExistente.isPresent()) {
+
+                        Usuario usuario = usuarioExistente.get();
+
+                        if (!Boolean.FALSE.equals(usuario.getAtivo())) {
+                                throw new ResponseStatusException(
+                                                HttpStatus.CONFLICT,
+                                                "Já existe um usuário ativo com este e-mail");
+                        }
+
+                        // Reativa o usuário
+                        usuario.setNome(nome.trim());
+                        usuario.setEmail(emailTratado);
+                        usuario.setSenhaHash(passwordEncoder.encode(senha));
+                        usuario.setPerfil(perfil);
+                        usuario.setAtivo(true);
+                        usuario.setPrimeiroAcesso(true);
+                        usuario.setTokenRedefinicao(null);
+                        usuario.setTokenExpiraEm(null);
+
+                        return usuarioRepository.save(usuario);
+                }
+
+                // Cria novo usuário
+                Usuario usuario = new Usuario();
+
+                usuario.setNome(nome.trim());
+                usuario.setEmail(emailTratado);
+                usuario.setSenhaHash(passwordEncoder.encode(senha));
+                usuario.setPerfil(perfil);
+                usuario.setAtivo(true);
+                usuario.setPrimeiroAcesso(true);
+
+                return usuarioRepository.save(usuario);
+        }
+
+        // Lista os usuários
+        public List<Usuario> listarTodos() {
+                return usuarioRepository.findAll();
+        }
+
+        // Inativa o usuário sem apagar seu histórico
+        public void excluirUsuario(Long id) {
+
+                Usuario usuario = usuarioRepository.findById(id)
+                                .orElseThrow(() -> new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND,
+                                                "Usuário não encontrado"));
+
+                usuario.setAtivo(false);
+
+                // Invalida recuperação pendente
+                usuario.setTokenRedefinicao(null);
+                usuario.setTokenExpiraEm(null);
+
+                usuarioRepository.save(usuario);
+        }
 }

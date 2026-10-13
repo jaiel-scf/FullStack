@@ -5,12 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Entrada - Sistema de Almoxarifado</title>
+    <title>Entrada - SIA</title>
+
+    <!-- Ícone da aba -->
+    <link rel="icon" type="image/svg+xml" href="assets/icons/blocksAzul.svg">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
-    <!-- CSS próprio do projeto -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -19,77 +21,132 @@
     <div class="min-h-screen flex">
 
         <!-- Menu lateral -->
-        <aside class="w-64 bg-blue-800 text-white p-6 flex flex-col">
+        <aside class="w-72 bg-slate-50 border-r border-slate-200 p-6 flex flex-col">
 
+            <!-- Identidade oficial do SIA -->
             <div class="flex items-center gap-3 mb-10">
-                <img src="assets/icons/blocks.svg" alt="Ícone do sistema" class="w-8 h-8">
 
-                <h1 class="text-lg font-bold">
-                    SIA
-                </h1>
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm"
+                    style="background: linear-gradient(135deg, #2563eb, #38bdf8);">
+                    <img src="assets/icons/blocks.svg" alt="Ícone do SIA" class="w-7 h-7 brightness-0 invert">
+                </div>
+
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900">SIA</h1>
+                    <p class="text-xs text-slate-500">Sistema de Almoxarifado</p>
+                </div>
+
             </div>
-            <nav class="space-y-3">
 
-                <!-- VAi para Estoque -->
+            <!-- Navegação -->
+            <nav class="space-y-2">
+
+                <!-- Estoque -->
                 <a href="./estoque.html"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
-                    <img src="assets/icons/package-plus.svg" alt="" class="w-5 h-5">
-
+                    class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-700 hover:bg-blue-50 transition">
+                    <span class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+                        <img src="assets/icons/package (1).svg" alt="" class="w-5 h-5 brightness-0 invert">
+                    </span>
                     <span>Estoque</span>
                 </a>
 
-                <!-- Vai para Requisições -->
-                <a href="./requisicoes.html"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
-                    <img src="assets/icons/clipboard-list.svg" alt="" class="w-5 h-5">
-
-                    <span>Requisições</span>
-                </a>
-
-                <!-- Vai para entrada -->
-                <a href="./entrada.html" class="flex items-center gap-3 bg-blue-700 px-4 py-3 rounded-lg">
-                    <img src="assets/icons/package-plus.svg" alt="" class="w-5 h-5">
-
+                <!-- Entrada -->
+                <a href="./entrada.html"
+                    class="flex items-center gap-3 bg-green-50 text-green-700 px-3 py-3 rounded-xl font-semibold">
+                    <span class="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center">
+                        <img src="assets/icons/package-plus.svg" alt="" class="w-5 h-5 brightness-0 invert">
+                    </span>
                     <span>Entrada</span>
                 </a>
 
-                <!-- Usuários - visível somente para administrador -->
-                <a href="./usuarios.html" id="menuUsuarios"
-                    class="hidden flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition">
-                    <img src="assets/icons/house-plus.svg" alt="" class="w-5 h-5">
+                <!-- Requisições -->
+                <a href="./requisicoes.html"
+                    class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-700 hover:bg-orange-50 transition">
+                    <span class="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
+                        <img src="assets/icons/clipboard-list.svg" alt="" class="w-5 h-5 brightness-0 invert">
+                    </span>
+                    <span>Requisições</span>
+                </a>
 
+                <!-- Usuários -->
+                <a href="./usuarios.html" id="menuUsuarios"
+                    class="hidden flex items-center gap-3 px-3 py-3 rounded-xl text-slate-700 hover:bg-violet-50 transition">
+                    <span class="w-10 h-10 bg-violet-600 rounded-xl flex items-center justify-center">
+                        <img src="assets/icons/user-plus.svg" alt="" class="w-5 h-5 brightness-0 invert">
+                    </span>
                     <span>Usuários</span>
                 </a>
 
             </nav>
+
+            <!-- Sair -->
             <a href="login.html" id="botaoSair"
-                class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-blue-700 transition mt-auto">
-
-                <img src="assets/icons/log-out.svg" alt="" class="w-5 h-5">
-
-                <span>Sair</span>
+                class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 hover:bg-red-50 hover:text-red-600 transition mt-auto">
+                <span class="w-10 h-10 bg-slate-200 rounded-xl flex items-center justify-center">
+                    <img src="assets/icons/log-out.svg" alt="" class="w-5 h-5">
+                </span>
+                <span class="font-medium">Sair</span>
             </a>
 
         </aside>
 
-        <!-- Conteúdo principal -->
-        <div class="flex-1 min-h-screen flex flex-col">
+        <!-- Área principal -->
+        <div class="flex-1 min-w-0 flex flex-col">
 
             <main class="flex-1 p-8">
-                <div class="mb-8">
-                    <h2 class="text-3xl font-bold text-slate-800">
-                        Entrada de Materiais
-                    </h2>
 
-                    <p class="text-slate-500 mt-1">
-                        Registrar a entrada de materiais no estoque.
-                    </p>
+                <!-- Cabeçalho -->
+                <div class="flex items-start justify-between gap-8 mb-8">
+
+                    <!-- Identificação da página -->
+                    <div class="flex items-center gap-4">
+
+                        <div class="w-14 h-14 bg-green-600 rounded-2xl flex items-center justify-center shadow-sm">
+                            <img src="assets/icons/package-plus.svg" alt="" class="w-7 h-7 brightness-0 invert">
+                        </div>
+
+                        <div>
+                            <h2 class="text-3xl font-bold text-slate-800">
+                                Entrada de Materiais
+                            </h2>
+                            <p class="text-slate-500 mt-1">
+                                Registre entradas de produtos no estoque.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <!-- Usuário logado -->
+                    <div class="text-right pt-1">
+                        <p class="text-sm text-slate-500">Bem-vindo</p>
+                        <p id="nomeUsuario" class="text-lg font-bold text-slate-900 mt-1">
+                            Usuário
+                        </p>
+                        <p id="perfilUsuario" class="text-sm text-slate-500 mt-1"></p>
+                    </div>
+
                 </div>
+
+                <!-- Card principal -->
                 <section class="bg-slate-50 rounded-xl shadow-md p-6 max-w-3xl">
 
-                    <h3 id="tituloNovaEntrada" class="text-xl font-semibold text-slate-800 mb-6">
-                        Nova entrada
-                    </h3>
+                    <div class="flex items-center justify-between mb-6">
+
+                        <div>
+                            <h3 class="text-xl font-semibold text-slate-800">
+                                Nova entrada
+                            </h3>
+                            <p class="text-sm text-slate-500 mt-1">
+                                Selecione um produto já cadastrado.
+                            </p>
+                        </div>
+
+                        <button type="button" id="botaoNovoProduto"
+                            class="bg-green-600 text-white font-semibold px-5 py-3 rounded-lg hover:bg-green-700 transition">
+                            + Novo produto
+                        </button>
+
+                    </div>
 
                     <form id="formEntrada">
 
@@ -100,33 +157,23 @@
                                 Produto
                             </label>
 
-                            <div class="flex gap-3">
-
-                                <select id="produtoEntrada"
-                                    class="flex-1 border border-slate-300 rounded-lg p-3 outline-none focus:border-blue-500">
-                                    <option value="">
-                                        Selecione um produto
-                                    </option>
-                                </select>
-
-                                <button type="button" id="botaoNovoProduto"
-                                    class="bg-blue-600 text-white font-semibold px-5 rounded-lg hover:bg-blue-700 transition">
-                                    Novo
-                                </button>
-
-                            </div>
+                            <select id="produtoEntrada"
+                                class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-green-500">
+                                <option value="">Selecione um produto</option>
+                            </select>
 
                         </div>
+
                         <!-- Quantidade -->
                         <div class="mb-5">
 
                             <label for="quantidadeEntrada" class="block text-sm font-medium text-slate-700 mb-2">
-                                Quantidade
+                                Quantidade recebida
                             </label>
 
-                            <input type="number" id="quantidadeEntrada" min="1"
-                                placeholder="Digite a quantidade recebida"
-                                class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-blue-500">
+                            <input type="number" id="quantidadeEntrada" min="1" step="1"
+                                placeholder="Digite a quantidade"
+                                class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-green-500">
 
                         </div>
 
@@ -137,95 +184,49 @@
                                 Observação
                             </label>
 
-                            <textarea id="observacaoEntrada" rows="3" placeholder="Ex.: Reposição de estoque"
-                                class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-blue-500 resize-none"></textarea>
+                            <textarea id="observacaoEntrada" rows="3" placeholder="Ex.: Reposição mensal"
+                                class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-green-500 resize-none"></textarea>
 
                         </div>
 
-                        <!-- Botão para registrar a entrada -->
                         <button type="submit"
-                            class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                            class="bg-green-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-700 transition">
                             Registrar entrada
                         </button>
 
                         <p id="mensagemEntrada" class="text-sm mt-4"></p>
 
                     </form>
-                    <!-- Cadastro de novo produto -->
-                    <div id="cadastroNovoProduto" class="hidden mt-8 border-t border-slate-200 pt-6">
 
-                        <h3 class="text-xl font-semibold text-slate-800 mb-6">
-                            Cadastrar novo produto
+                </section>
+
+                <!-- Histórico de entradas -->
+                <section class="bg-slate-50 rounded-xl shadow-md p-6 max-w-3xl mt-6">
+
+                    <div class="mb-5">
+                        <h3 class="text-xl font-semibold text-slate-800">
+                            Últimas entradas
                         </h3>
 
-                        <form id="formNovoProduto">
+                        <p class="text-sm text-slate-500 mt-1">
+                            Histórico de produtos recebidos no estoque.
+                        </p>
+                    </div>
 
-                            <!-- Nome -->
-                            <div class="mb-5">
+                    <!-- Mensagens do histórico -->
+                    <p id="mensagemHistorico" class="text-sm text-slate-500 text-center py-5">
+                        Carregando últimas entradas...
+                    </p>
 
-                                <label for="nomeProduto" class="block text-sm font-medium text-slate-700 mb-2">
-                                    Nome
-                                </label>
+                    <!-- Registros -->
+                    <div id="listaUltimasEntradas" class="space-y-3"></div>
 
-                                <input type="text" id="nomeProduto" placeholder="Digite o nome do produto"
-                                    class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-blue-500">
+                    <!-- Paginação -->
+                    <div id="areaPaginacaoEntradas" class="hidden border-t border-slate-200 mt-5 pt-5">
+                        <p id="informacaoPaginacaoEntradas" class="text-sm text-slate-500 text-center mb-3"></p>
 
-                            </div>
-
-                            <!-- Código -->
-                            <div class="mb-5">
-
-                                <label for="codigoProduto" class="block text-sm font-medium text-slate-700 mb-2">
-                                    Código
-                                </label>
-
-                                <input type="text" id="codigoProduto" placeholder="Digite o código do produto"
-                                    class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-blue-500">
-
-                            </div>
-
-                            <!-- Descrição -->
-                            <div class="mb-5">
-
-                                <label for="descricaoProduto" class="block text-sm font-medium text-slate-700 mb-2">
-                                    Descrição
-                                </label>
-
-                                <textarea id="descricaoProduto" rows="3" placeholder="Digite uma descrição"
-                                    class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-blue-500 resize-none"></textarea>
-
-                            </div>
-
-                            <!-- Localização -->
-                            <div class="mb-6">
-
-                                <label for="localizacaoProduto" class="block text-sm font-medium text-slate-700 mb-2">
-                                    Localização
-                                </label>
-
-                                <input type="text" id="localizacaoProduto" placeholder="Ex.: Prateleira A2"
-                                    class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-blue-500">
-
-                            </div>
-
-                            <div class="flex gap-3">
-
-                                <button type="button" id="cancelarNovoProduto"
-                                    class="border border-slate-300 text-slate-700 font-semibold px-6 py-3 rounded-lg hover:bg-slate-100 transition">
-                                    Cancelar
-                                </button>
-
-                                <button type="submit"
-                                    class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition">
-                                    Cadastrar produto
-                                </button>
-
-                            </div>
-
-                            <p id="mensagemNovoProduto" class="text-sm mt-4"></p>
-
-                        </form>
-
+                        <div id="botoesPaginacaoEntradas" class="flex flex-wrap items-center justify-center gap-2">
+                        </div>
                     </div>
 
                 </section>
@@ -241,22 +242,159 @@
 
     </div>
 
+    <!-- Modal novo produto -->
+    <div id="modalNovoProduto" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+
+        <div id="conteudoModal"
+            class="bg-slate-50 rounded-xl shadow-2xl w-full max-w-[600px] max-h-[90vh] overflow-y-auto">
+
+            <!-- Cabeçalho -->
+            <div class="flex items-center justify-between px-6 py-5 border-b border-slate-200">
+
+                <div>
+                    <h3 class="text-xl font-semibold text-slate-800">
+                        Cadastrar novo produto
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-1">
+                        Informe os dados do produto.
+                    </p>
+                </div>
+
+                <button type="button" id="botaoFecharModal"
+                    class="text-slate-400 hover:text-slate-700 text-2xl font-bold">
+                    ×
+                </button>
+
+            </div>
+
+            <form id="formNovoProduto" class="p-6">
+
+                <!-- Nome -->
+                <div class="mb-5">
+
+                    <label for="nomeProduto" class="block text-sm font-medium text-slate-700 mb-2">
+                        Nome do produto
+                    </label>
+
+                    <input type="text" id="nomeProduto" placeholder="Ex.: Papel A4"
+                        class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-green-500">
+
+                </div>
+
+                <!-- Código -->
+                <div class="mb-5">
+
+                    <label for="codigoProduto" class="block text-sm font-medium text-slate-700 mb-2">
+                        Código / SKU
+                    </label>
+
+                    <div class="flex gap-3">
+
+                        <input type="text" id="codigoProduto" placeholder="Digite ou gere o código"
+                            class="flex-1 border border-slate-300 rounded-lg p-3 outline-none focus:border-green-500 uppercase">
+
+                        <button type="button" id="botaoGerarCodigo"
+                            class="bg-slate-700 text-white font-semibold px-4 rounded-lg hover:bg-slate-800 transition whitespace-nowrap">
+                            Gerar código
+                        </button>
+
+                    </div>
+
+                    <p class="text-xs text-slate-500 mt-2">
+                        Exemplo: P261007.A7K3
+                    </p>
+
+                </div>
+
+                <!-- Descrição -->
+                <div class="mb-5">
+
+                    <label for="descricaoProduto" class="block text-sm font-medium text-slate-700 mb-2">
+                        Descrição
+                    </label>
+
+                    <textarea id="descricaoProduto" rows="3" placeholder="Digite uma descrição"
+                        class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-green-500 resize-none"></textarea>
+
+                </div>
+
+                <!-- Localização -->
+                <div class="mb-5">
+
+                    <label for="localizacaoProduto" class="block text-sm font-medium text-slate-700 mb-2">
+                        Localização
+                    </label>
+
+                    <input type="text" id="localizacaoProduto" placeholder="Ex.: Prateleira A2"
+                        class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-green-500">
+
+                </div>
+
+                <!-- Unidade -->
+                <div class="mb-5">
+
+                    <label for="unidadeMedidaProduto" class="block text-sm font-medium text-slate-700 mb-2">
+                        Unidade de medida
+                    </label>
+
+                    <select id="unidadeMedidaProduto"
+                        class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-green-500">
+                        <option value="">Selecione</option>
+                        <option value="UNIDADE">Unidade</option>
+                        <option value="CAIXA">Caixa</option>
+                        <option value="PACOTE">Pacote</option>
+                        <option value="METRO">Metro</option>
+                        <option value="LITRO">Litro</option>
+                        <option value="QUILO">Quilo</option>
+                    </select>
+
+                </div>
+
+                <!-- Estoque mínimo -->
+                <div class="mb-6">
+
+                    <label for="estoqueMinimoProduto" class="block text-sm font-medium text-slate-700 mb-2">
+                        Estoque mínimo
+                    </label>
+
+                    <input type="number" id="estoqueMinimoProduto" min="0" step="1" placeholder="Ex.: 10"
+                        class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-green-500">
+
+                    <p class="text-xs text-slate-500 mt-2">
+                        Usado para indicar estoque normal, baixo ou crítico.
+                    </p>
+
+                </div>
+
+                <p id="mensagemNovoProduto" class="text-sm mb-5"></p>
+
+                <!-- Botões -->
+                <div class="flex justify-end gap-3">
+
+                    <button type="button" id="botaoCancelarNovo"
+                        class="border border-slate-300 text-slate-700 font-semibold px-5 py-3 rounded-lg hover:bg-slate-100 transition">
+                        Cancelar
+                    </button>
+
+                    <button type="submit"
+                        class="bg-green-600 text-white font-semibold px-5 py-3 rounded-lg hover:bg-green-700 transition">
+                        Cadastrar produto
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- Configuração do backend -->
+    <script src="js/config.js"></script>
+
+    <!-- Funcionalidades das entradas -->
     <script src="js/entrada.js"></script>
-    <script>
-        const botaoSair = document.getElementById("botaoSair");
-
-        botaoSair.addEventListener("click", function (event) {
-
-            event.preventDefault();
-
-            sessionStorage.removeItem("token");
-            sessionStorage.removeItem("usuarioId");
-            sessionStorage.removeItem("usuarioNome");
-            sessionStorage.removeItem("usuarioPerfil");
-
-            window.location.href = "login.html?logout=1";
-        });
-    </script>
 
 </body>
 

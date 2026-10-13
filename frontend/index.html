@@ -7,23 +7,41 @@
 
     <title>SIA - Sistema de Almoxarifado</title>
 
+    <!-- Ícone da aba -->
+    <link rel="icon" type="image/svg+xml" href="assets/icons/blocksAzul.svg">
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
+    <!-- Estilos e animações -->
     <link rel="stylesheet" href="css/style.css">
+
 </head>
 
 <body class="bg-gradient-to-br from-slate-900 via-blue-800 to-sky-700">
 
-    <main class="min-h-screen flex items-center justify-center">
+    <main class="min-h-screen flex items-center justify-center p-4">
 
         <div class="text-center text-white">
 
-            <img src="assets/icons/blocks.svg" alt="Ícone do sistema" class="w-20 h-20 mx-auto mb-6 animacao-logo">
+            <!-- Ícone oficial do SIA -->
+            <div class="flex justify-center mb-6">
 
+                <div class="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg animacao-logo"
+                    style="background: linear-gradient(135deg, #2563eb, #38bdf8);">
+
+                    <img src="assets/icons/blocks.svg" alt="Ícone do SIA" class="w-12 h-12 brightness-0 invert">
+
+                </div>
+
+            </div>
+
+            <!-- Nome do sistema -->
             <h1 class="text-6xl font-bold animacao-titulo">
                 SIA
             </h1>
 
+            <!-- Descrição -->
             <p class="text-xl mt-3 text-blue-100 animacao-subtitulo">
                 Sistema de Almoxarifado
             </p>
@@ -32,6 +50,7 @@
 
     </main>
 
+    <!-- Abre o Login após 2,5 segundos -->
     <script>
         setTimeout(function () {
             window.location.href = "login.html";

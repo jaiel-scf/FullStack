@@ -12,12 +12,13 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-// Recebe as requisições relacionadas aos usuários
+// Requisições relacionadas aos usuários
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
@@ -28,7 +29,7 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    // Cadastra um novo usuário
+    // Cadastra ou reativa usuário
     @PostMapping("/registrar")
     public UsuarioResponse cadastrar(
             @RequestBody UsuarioRequest request,
@@ -45,7 +46,7 @@ public class UsuarioController {
         return criarResponse(usuario);
     }
 
-    // Lista todos os usuários cadastrados
+    // Lista os usuários
     @GetMapping("/listar")
     public List<UsuarioResponse> listar(
             @AuthenticationPrincipal Jwt jwt) {
@@ -58,7 +59,33 @@ public class UsuarioController {
                 .toList();
     }
 
-    // Exclui um usuário
+    // Troca a senha no primeiro acesso
+    @PutMapping("/primeiro-acesso/senha")
+    public void alterarSenhaPrimeiroAcesso(
+            @RequestBody AlterarSenhaRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        if (jwt == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Usuário não autenticado");
+        }
+
+        Number usuarioId = jwt.getClaim("id");
+
+        if (usuarioId == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Usuário inválido");
+        }
+
+        // Não exige novamente a senha padrão
+        usuarioService.alterarSenhaPrimeiroAcesso(
+                usuarioId.longValue(),
+                request.getNovaSenha());
+    }
+
+    // Inativa usuário
     @DeleteMapping("/{id}")
     public void excluir(
             @PathVariable Long id,
@@ -68,9 +95,9 @@ public class UsuarioController {
 
         Number usuarioLogadoId = jwt.getClaim("id");
 
-        // Impede que o usuário apague a própria conta
-        if (usuarioLogadoId != null &&
-                usuarioLogadoId.longValue() == id.longValue()) {
+        // Impede inativar a própria conta
+        if (usuarioLogadoId != null
+                && usuarioLogadoId.longValue() == id.longValue()) {
 
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
@@ -80,8 +107,14 @@ public class UsuarioController {
         usuarioService.excluirUsuario(id);
     }
 
-    // Verifica se o usuário logado é administrador
+    // Confere perfil de administrador
     private void validarAdmin(Jwt jwt) {
+
+        if (jwt == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Usuário não autenticado");
+        }
 
         String perfil = jwt.getClaimAsString("perfil");
 
@@ -92,7 +125,7 @@ public class UsuarioController {
         }
     }
 
-    // Evita enviar senha ou senha_hash para o frontend
+    // Monta a resposta para o frontend
     private UsuarioResponse criarResponse(Usuario usuario) {
 
         return new UsuarioResponse(
@@ -100,10 +133,11 @@ public class UsuarioController {
                 usuario.getNome(),
                 usuario.getEmail(),
                 usuario.getPerfil(),
-                usuario.getAtivo());
+                usuario.getAtivo(),
+                usuario.getPrimeiroAcesso());
     }
 
-    // Dados recebidos ao cadastrar um usuário
+    // Dados recebidos no cadastro
     public static class UsuarioRequest {
 
         private String nome;
@@ -144,7 +178,21 @@ public class UsuarioController {
         }
     }
 
-    // Dados enviados para o frontend
+    // Dados recebidos na alteração de senha
+    public static class AlterarSenhaRequest {
+
+        private String novaSenha;
+
+        public String getNovaSenha() {
+            return novaSenha;
+        }
+
+        public void setNovaSenha(String novaSenha) {
+            this.novaSenha = novaSenha;
+        }
+    }
+
+    // Dados enviados ao frontend
     public static class UsuarioResponse {
 
         private Long id;
@@ -152,19 +200,22 @@ public class UsuarioController {
         private String email;
         private String perfil;
         private Boolean ativo;
+        private Boolean primeiroAcesso;
 
         public UsuarioResponse(
                 Long id,
                 String nome,
                 String email,
                 String perfil,
-                Boolean ativo) {
+                Boolean ativo,
+                Boolean primeiroAcesso) {
 
             this.id = id;
             this.nome = nome;
             this.email = email;
             this.perfil = perfil;
             this.ativo = ativo;
+            this.primeiroAcesso = primeiroAcesso;
         }
 
         public Long getId() {
@@ -185,6 +236,10 @@ public class UsuarioController {
 
         public Boolean getAtivo() {
             return ativo;
+        }
+
+        public Boolean getPrimeiroAcesso() {
+            return primeiroAcesso;
         }
     }
 }

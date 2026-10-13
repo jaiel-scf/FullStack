@@ -1,5 +1,4 @@
 /* Animação da tela inicial do SIA */
-
 .animacao-logo {
   animation: aparecerLogo 1s ease;
 }

@@ -7,8 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.almoxarifado.backend.model.Usuario;
 
 // Repositório responsável por acessar os usuários no banco
-public interface UsuarioRepository extends JpaRepository<Usuario, Long>{
-    // Busca um usuário pelo email
+public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+
+    // Busca um usuário pelo e-mail
     Optional<Usuario> findByEmail(String email);
-    
+
+    // Busca um usuário pelo token de redefinição
+    Optional<Usuario> findByTokenRedefinicao(String tokenRedefinicao);
 }
