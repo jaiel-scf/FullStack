@@ -1,1 +1,1 @@
-const API_URL = "http://localhost:8080";
+const API_URL = "https://fullstack-production-d62d.up.railway.app";
