@@ -1,21 +1,27 @@
+
 package com.almoxarifado.backend.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.almoxarifado.backend.model.Produto;
 import com.almoxarifado.backend.repository.ProdutoRepository;
 
-// Regras de negócio de Produto
 @Service
 public class ProdutoService {
 
     private final ProdutoRepository produtoRepository;
+    private final ImagemService imagemService;
 
-    public ProdutoService(ProdutoRepository produtoRepository) {
+    public ProdutoService(
+            ProdutoRepository produtoRepository,
+            ImagemService imagemService) {
         this.produtoRepository = produtoRepository;
+        this.imagemService = imagemService;
     }
 
     // Lista somente produtos ativos
@@ -29,7 +35,6 @@ public class ProdutoService {
     // Salva um produto
     public Produto salvar(Produto produto) {
 
-        // Produto novo entra ativo
         if (produto.getAtivo() == null) {
             produto.setAtivo(true);
         }
@@ -42,11 +47,10 @@ public class ProdutoService {
         return produtoRepository.findById(id);
     }
 
-    // Edita um produto
+    // Edita os dados do produto
     public Produto editar(Long id, Produto dadosProduto) {
 
-        Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
+        Produto produto = buscarProduto(id);
 
         produto.setNome(dadosProduto.getNome());
         produto.setCodigo(dadosProduto.getCodigo());
@@ -58,11 +62,54 @@ public class ProdutoService {
         return produtoRepository.save(produto);
     }
 
+    // Envia ou substitui a imagem do produto
+    public Produto salvarImagem(Long id, MultipartFile arquivo) throws IOException {
+
+        Produto produto = buscarProduto(id);
+
+        String imagemAnterior = produto.getImagemCaminho();
+        String novaImagem = imagemService.salvar(arquivo);
+
+        produto.setImagemCaminho(novaImagem);
+
+        Produto produtoSalvo = produtoRepository.save(produto);
+
+        if (imagemAnterior != null && !imagemAnterior.isBlank()) {
+            imagemService.excluir(imagemAnterior);
+        }
+
+        return produtoSalvo;
+    }
+
+    // Remove a imagem do produto
+    public Produto removerImagem(Long id) throws IOException {
+
+        Produto produto = buscarProduto(id);
+
+        String imagemAnterior = produto.getImagemCaminho();
+
+        produto.setImagemCaminho(null);
+
+        Produto produtoSalvo = produtoRepository.save(produto);
+
+        if (imagemAnterior != null && !imagemAnterior.isBlank()) {
+            imagemService.excluir(imagemAnterior);
+        }
+
+        return produtoSalvo;
+    }
+
+    // Busca produto ou retorna erro
+    private Produto buscarProduto(Long id) {
+
+        return produtoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
+    }
+
     // Inativa um produto
     public Produto inativar(Long id) {
 
-        Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
+        Produto produto = buscarProduto(id);
 
         produto.setAtivo(false);
 

@@ -4,357 +4,799 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Requisições - SIA</title>
 
-    <!-- Ícone da aba e estilos -->
+    <title>Estoque | SIA</title>
+
     <link rel="icon" type="image/svg+xml" href="assets/icons/blocksAzul.svg">
+
+    <!-- JavaScript das preferências -->
+    <script src="js/preferencias.js"></script>
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- CSS do sistema -->
     <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        body {
+            font-family: Inter, "Segoe UI", sans-serif;
+        }
+
+        .sidebar {
+            background: #101b35;
+        }
+
+        .sidebar-link {
+            transition: all .2s ease;
+        }
+
+        .sidebar-link:hover {
+            background: rgba(255, 255, 255, .09);
+            transform: translateX(3px);
+        }
+
+        .sidebar-link.active {
+            background: linear-gradient(110deg, #2563eb, #3b82f6);
+            color: white;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, .25);
+        }
+
+        .main-background {
+            background: #f4f7fc;
+        }
+
+        .panel {
+            background: white;
+            border: 1px solid #e7edf5;
+            box-shadow: 0 8px 25px rgba(15, 23, 42, .035);
+        }
+
+        .input-modern {
+            transition: all .2s ease;
+        }
+
+        .input-modern:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, .12);
+        }
+
+        #tabelaRequisicoes tr {
+            transition: background .2s ease;
+        }
+
+        #tabelaRequisicoes tr:hover,
+        #tabelaRequisicoes tr:focus {
+            background: #f8fafc;
+        }
+
+        #botoesPaginacaoRequisicoes button[aria-current="page"] {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: white;
+        }
+
+        #botoesPaginacaoRequisicoes button:not([aria-current="page"]):hover {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .modal-card {
+            animation: modalEntrada .2s ease-out;
+        }
+
+        @keyframes modalEntrada {
+            from {
+                opacity: 0;
+                transform: translateY(12px) scale(.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @media (max-width: 767px) {
+            .sidebar {
+                width: 76px;
+                padding: 16px 10px;
+            }
+
+            .sidebar .brand-text,
+            .sidebar .menu-text,
+            .sidebar .sidebar-footer-text {
+                display: none;
+            }
+
+            .sidebar-link {
+                justify-content: center;
+                padding: 12px;
+            }
+
+            .conteudo-principal {
+                padding: 24px 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .cabecalho-pagina {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .identificacao-usuario {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 
-<body class="bg-slate-100">
+<body class="main-background min-h-screen">
 
     <div class="min-h-screen flex">
 
-        <!-- Menu lateral -->
-        <aside class="w-72 bg-slate-50 border-r border-slate-200 p-6 flex flex-col">
 
-            <!-- Identidade oficial do SIA -->
-            <div class="flex items-center gap-3 mb-10">
-                <div class="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm"
+
+        <!-- MENU LATERAL -->
+        <aside class="sidebar w-72 min-h-screen p-6 flex flex-col shrink-0">
+
+            <div class="flex items-center gap-3 mb-12 px-1">
+
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
                     style="background: linear-gradient(135deg, #2563eb, #38bdf8);">
-                    <img src="assets/icons/blocks.svg" alt="Ícone do SIA" class="w-7 h-7 brightness-0 invert">
+
+                    <img src="assets/icons/blocks.svg" alt="SIA" class="w-7 h-7 brightness-0 invert">
+
                 </div>
 
-                <div>
-                    <h1 class="text-xl font-bold text-slate-900">SIA</h1>
-                    <p class="text-xs text-slate-500">
+                <div class="brand-text">
+                    <h1 class="text-xl font-bold text-white tracking-wide">
+                        SIA
+                    </h1>
+
+                    <p class="text-xs text-slate-400">
                         Sistema de Almoxarifado
                     </p>
                 </div>
+
             </div>
 
-            <!-- Navegação -->
+            <div class="mb-4 px-3 brand-text">
+                <p class="text-[10px] font-bold uppercase tracking-[2px] text-slate-500">
+                    Menu principal
+                </p>
+            </div>
+
             <nav class="space-y-2">
 
+                <!-- Estoque -->
                 <a href="./estoque.html"
-                    class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-700 hover:bg-blue-50 transition">
-                    <span class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+                    class="sidebar-link flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300">
+
+                    <span class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-white/15">
                         <img src="assets/icons/package (1).svg" alt="" class="w-5 h-5 brightness-0 invert">
                     </span>
-                    <span>Estoque</span>
+
+                    <span class="menu-text">Estoque</span>
                 </a>
 
+                <!-- Entrada -->
                 <a href="./entrada.html" id="menuEntrada"
-                    class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-700 hover:bg-green-50 transition">
-                    <span class="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center">
+                    class="sidebar-link flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300">
+
+                    <span class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-emerald-500/15">
                         <img src="assets/icons/package-plus.svg" alt="" class="w-5 h-5 brightness-0 invert">
                     </span>
-                    <span>Entrada</span>
+
+                    <span class="menu-text">Entrada</span>
                 </a>
 
+                <!-- Requisições -->
                 <a href="./requisicoes.html"
-                    class="flex items-center gap-3 bg-orange-50 text-orange-700 px-3 py-3 rounded-xl font-semibold">
-                    <span class="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
+                    class="sidebar-link active flex items-center gap-3 px-3 py-3 rounded-xl font-semibold">
+
+                    <span class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-white/15">
                         <img src="assets/icons/clipboard-list.svg" alt="" class="w-5 h-5 brightness-0 invert">
                     </span>
-                    <span>Requisições</span>
+
+                    <span class="menu-text">Requisições</span>
                 </a>
 
+                <!-- Usuários -->
                 <a href="./usuarios.html" id="menuUsuarios"
-                    class="hidden flex items-center gap-3 px-3 py-3 rounded-xl text-slate-700 hover:bg-violet-50 transition">
-                    <span class="w-10 h-10 bg-violet-600 rounded-xl flex items-center justify-center">
+                    class="sidebar-link hidden flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300">
+
+                    <span class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-violet-500/15">
                         <img src="assets/icons/user-plus.svg" alt="" class="w-5 h-5 brightness-0 invert">
                     </span>
-                    <span>Usuários</span>
+
+                    <span class="menu-text">Usuários</span>
                 </a>
+
             </nav>
 
-            <!-- Sair -->
-            <a href="login.html" id="botaoSair"
-                class="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-600 hover:bg-red-50 hover:text-red-600 transition mt-auto">
-                <span class="w-10 h-10 bg-slate-200 rounded-xl flex items-center justify-center">
-                    <img src="assets/icons/log-out.svg" alt="" class="w-5 h-5">
-                </span>
-                <span class="font-medium">Sair</span>
-            </a>
+            <div class="mt-auto pt-6 border-t border-white/10">
+
+                <a href="login.html" id="botaoSair"
+                    class="sidebar-link flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:!bg-red-500/10 hover:!text-red-400">
+
+                    <span class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-red-500/15">
+                        <img src="assets/icons/log-out.svg" alt="" class="w-5 h-5 brightness-0 invert">
+                    </span>
+
+                    <span class="menu-text font-medium">Sair do sistema</span>
+                </a>
+
+                <p class="sidebar-footer-text text-[10px] text-slate-500 mt-6 text-center">
+                    SIA • Sistema de Almoxarifado
+                </p>
+
+            </div>
+
         </aside>
 
         <!-- Área principal -->
         <div class="flex-1 min-w-0 flex flex-col">
 
-            <main class="flex-1 p-8">
+            <main class="conteudo-principal flex-1 p-5 md:p-8 lg:p-10">
 
                 <!-- Cabeçalho -->
-                <div class="flex items-start justify-between gap-8 mb-8">
+                <header class="cabecalho-pagina flex flex-col md:flex-row md:items-center justify-between gap-5 mb-9">
 
                     <div class="flex items-center gap-4">
 
-                        <!-- Ícone específico da página -->
-                        <div class="w-14 h-14 bg-orange-500 rounded-2xl flex items-center justify-center shadow-sm">
+                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200 shrink-0"
+                            style="background: linear-gradient(135deg, #1d4ed8, #60a5fa);">
+
                             <img src="assets/icons/clipboard-list.svg" alt="" class="w-7 h-7 brightness-0 invert">
+
                         </div>
 
                         <div>
-                            <h2 class="text-3xl font-bold text-slate-800">
+                            <p class="text-xs font-bold uppercase tracking-widest text-blue-600 mb-1">
+                                Gestão de materiais
+                            </p>
+
+                            <h2 class="text-3xl font-bold text-slate-900 tracking-tight">
                                 Requisições
                             </h2>
-                            <p class="text-slate-500 mt-1">
+
+                            <p class="text-sm text-slate-500 mt-1">
                                 Consulte, filtre e acompanhe as requisições.
                             </p>
                         </div>
+
                     </div>
 
-                    <!-- Usuário logado -->
-                    <div class="text-right pt-1">
-                        <p class="text-sm text-slate-500">Bem-vindo</p>
-                        <p id="nomeUsuario" class="text-lg font-bold text-slate-900 mt-1">
-                            Usuário
-                        </p>
-                        <p id="perfilUsuario" class="text-sm text-slate-500 mt-1"></p>
-                    </div>
-                </div>
+                    <!-- USUÁRIO LOGADO -->
+                    <div class="relative shrink-0" id="areaMenuUsuario">
 
-                <!-- Nova requisição -->
-                <div class="flex flex-wrap gap-3 mb-6">
+                        <button type="button" id="botaoMenuUsuario"
+                            class="panel rounded-2xl px-5 py-3 flex items-center gap-3 hover:border-blue-300 transition cursor-pointer">
+
+                            <div class="w-11 h-11 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+                                <img src="assets/icons/user-round.svg" alt="Usuário" class="w-6 h-6">
+                            </div>
+
+                            <div class="text-left">
+                                <p class="text-xs text-slate-400">Bem-vindo</p>
+
+                                <p id="nomeUsuario" class="text-sm font-bold text-slate-800">
+                                    Usuário
+                                </p>
+
+                                <p id="perfilUsuario" class="text-xs text-slate-500"></p>
+                            </div>
+
+                            <span id="setaMenuUsuario" class="text-slate-400 transition-transform">
+                                ▼
+                            </span>
+
+                        </button>
+
+                        <!-- MENU DE CONFIGURAÇÕES -->
+                        <div id="menuConfiguracoesUsuario"
+                            class="hidden absolute right-0 top-full mt-2 w-60 bg-white rounded-xl border border-slate-200 shadow-xl z-50 overflow-hidden">
+
+                            <div class="px-4 py-3 border-b border-slate-100">
+                                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                    Minha conta
+                                </p>
+                            </div>
+
+                            <button type="button" id="botaoMeuPerfil"
+                                class="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-700 hover:bg-blue-50 transition">
+                                <span>👤</span>
+                                Meu perfil
+                            </button>
+
+                            <button type="button" id="botaoAlterarSenha"
+                                class="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-700 hover:bg-blue-50 transition">
+                                <span>🔒</span>
+                                Alterar senha
+                            </button>
+
+                            <button type="button" id="botaoPreferencias"
+                                class="w-full flex items-center gap-3 px-4 py-3 text-sm text-slate-700 hover:bg-blue-50 transition">
+                                <span>⚙️</span>
+                                Preferências
+                            </button>
+
+                            <div class="border-t border-slate-100"></div>
+
+                            <button type="button" id="botaoSairMenu"
+                                class="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition">
+                                <span>↪</span>
+                                Sair do sistema
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </header>
+
+                <!-- Ação principal -->
+                <div class="flex flex-wrap gap-3 mb-7">
+
                     <button type="button" id="botaoNovaRequisicao"
-                        class="bg-orange-500 text-white font-semibold px-5 py-3 rounded-lg hover:bg-orange-600 transition">
-                        + Nova requisição
+                        class="flex items-center gap-2 bg-blue-600 text-white font-semibold px-5 py-3 rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-100">
+
+                        <span class="text-lg leading-none">+</span>
+                        Nova requisição
+
                     </button>
+
                 </div>
 
                 <!-- Filtros -->
-                <section class="bg-slate-50 rounded-xl shadow-md p-6 mb-6">
-                    <h3 class="text-lg font-semibold text-slate-800 mb-5">
-                        Filtros
-                    </h3>
+                <section class="panel rounded-2xl p-5 md:p-6 mb-7">
+
+                    <div class="mb-5">
+                        <h3 class="font-bold text-slate-800">
+                            Filtros
+                        </h3>
+
+                        <p class="text-xs text-slate-400 mt-1">
+                            Utilize os campos abaixo para localizar uma requisição.
+                        </p>
+                    </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
 
-                        <!-- Código -->
                         <div>
-                            <label for="filtroCodigo" class="block text-sm font-medium text-slate-700 mb-2">
+                            <label for="filtroCodigo" class="block text-sm font-semibold text-slate-700 mb-2">
                                 Código
                             </label>
+
                             <input type="text" id="filtroCodigo" placeholder="Ex.: R261007"
-                                class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-orange-500">
+                                class="input-modern w-full border border-slate-200 rounded-xl p-3 outline-none">
                         </div>
 
-                        <!-- Criado por -->
                         <div>
-                            <label for="filtroUsuario" class="block text-sm font-medium text-slate-700 mb-2">
+                            <label for="filtroUsuario" class="block text-sm font-semibold text-slate-700 mb-2">
                                 Criado por
                             </label>
+
                             <input type="text" id="filtroUsuario" placeholder="Nome do usuário"
-                                class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-orange-500">
+                                class="input-modern w-full border border-slate-200 rounded-xl p-3 outline-none">
                         </div>
 
-                        <!-- Data de criação -->
                         <div>
-                            <label for="filtroDataCriacao" class="block text-sm font-medium text-slate-700 mb-2">
+                            <label for="filtroDataCriacao" class="block text-sm font-semibold text-slate-700 mb-2">
                                 Data de criação
                             </label>
+
                             <input type="date" id="filtroDataCriacao"
-                                class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-orange-500">
+                                class="input-modern w-full border border-slate-200 rounded-xl p-3 outline-none">
                         </div>
 
-                        <!-- Status -->
                         <div>
-                            <label for="filtroStatus" class="block text-sm font-medium text-slate-700 mb-2">
+                            <label for="filtroStatus" class="block text-sm font-semibold text-slate-700 mb-2">
                                 Status
                             </label>
+
                             <select id="filtroStatus"
-                                class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-orange-500">
+                                class="input-modern w-full border border-slate-200 rounded-xl p-3 outline-none bg-white">
+
                                 <option value="">Todos</option>
                                 <option value="AGUARDANDO">Aguardando</option>
                                 <option value="AUTORIZADO">Autorizado</option>
                                 <option value="REPROVADO">Reprovado</option>
                                 <option value="FINALIZADO">Finalizado</option>
+
                             </select>
                         </div>
 
-                        <!-- Data atualizada -->
                         <div>
-                            <label for="filtroDataAtualizada" class="block text-sm font-medium text-slate-700 mb-2">
+                            <label for="filtroDataAtualizada" class="block text-sm font-semibold text-slate-700 mb-2">
                                 Data atualizada
                             </label>
+
                             <input type="date" id="filtroDataAtualizada"
-                                class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-orange-500">
+                                class="input-modern w-full border border-slate-200 rounded-xl p-3 outline-none">
                         </div>
+
                     </div>
 
                     <div class="mt-5">
                         <button type="button" id="botaoLimparFiltros"
-                            class="text-orange-700 font-medium hover:underline">
+                            class="text-sm text-blue-600 font-semibold hover:text-blue-800 hover:underline transition">
                             Limpar filtros
                         </button>
                     </div>
+
                 </section>
 
                 <!-- Lista de requisições -->
-                <section class="bg-slate-50 rounded-xl shadow-md overflow-hidden">
+                <section class="panel rounded-2xl overflow-hidden">
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-slate-200 text-slate-700">
-                                <tr>
-                                    <th class="text-left p-4">Código</th>
-                                    <th class="text-left p-4">Criado por</th>
-                                    <th class="text-left p-4">Data de criação</th>
-                                    <th class="text-left p-4">Status</th>
-                                    <th class="text-left p-4">Data atualizada</th>
-                                </tr>
-                            </thead>
+                    <div class="px-5 md:px-7 py-5 border-b border-slate-100 flex items-center justify-between gap-3">
 
-                            <!-- Cada linha será clicável -->
-                            <tbody id="tabelaRequisicoes"></tbody>
-                        </table>
+                        <div>
+                            <h3 class="font-bold text-slate-800">
+                                Lista de requisições
+                            </h3>
+
+                            <p class="text-xs text-slate-400 mt-1">
+                                Selecione uma requisição para consultar os detalhes.
+                            </p>
+                        </div>
+
+                        <span class="bg-slate-100 px-3 py-2 rounded-lg text-xs font-semibold text-slate-500">
+                            Solicitações
+                        </span>
+
                     </div>
 
-                    <p id="mensagemLista" class="p-5 text-slate-500" aria-live="polite"></p>
+                    <div class="overflow-x-auto">
 
-                    <!-- Paginação: cinco requisições por página -->
-                    <div id="areaPaginacaoRequisicoes" class="hidden border-t border-slate-200 px-6 py-5">
-                        <p id="informacaoPaginacaoRequisicoes" class="text-sm text-slate-500 text-center mb-3"></p>
+                        <table class="w-full text-left min-w-[900px]">
+
+                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
+
+                                <tr>
+                                    <th class="px-6 py-4 font-bold whitespace-nowrap">Código</th>
+                                    <th class="px-6 py-4 font-bold whitespace-nowrap">Criado por</th>
+                                    <th class="px-6 py-4 font-bold whitespace-nowrap">Data de criação</th>
+                                    <th class="px-6 py-4 font-bold whitespace-nowrap">Status</th>
+                                    <th class="px-6 py-4 font-bold whitespace-nowrap">Data atualizada</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="tabelaRequisicoes" class="divide-y divide-slate-100"></tbody>
+
+                        </table>
+
+                    </div>
+
+                    <p id="mensagemLista" class="px-6 py-5 text-sm text-slate-500" aria-live="polite"></p>
+
+                    <div id="areaPaginacaoRequisicoes" class="hidden border-t border-slate-100 px-5 md:px-7 py-5">
+
+                        <p id="informacaoPaginacaoRequisicoes" class="text-xs text-slate-500 text-center mb-4"></p>
 
                         <div id="botoesPaginacaoRequisicoes" class="flex flex-wrap items-center justify-center gap-2">
                         </div>
+
                     </div>
+
                 </section>
+
+                <footer class="text-center text-xs text-slate-400 mt-8">
+                    Sistema de Almoxarifado • 2026
+                </footer>
+
             </main>
 
-            <!-- Rodapé -->
-            <footer class="bg-slate-200 text-slate-600 text-sm text-center py-4">
-                Sistema de Almoxarifado • 2026
-            </footer>
         </div>
+
     </div>
 
-    <!-- Modal com detalhes da requisição -->
-    <div id="modalDetalhesRequisicao" class="hidden fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4"
+    <!-- Modal de detalhes -->
+    <div id="modalDetalhesRequisicao"
+        class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
         role="dialog" aria-modal="true" aria-labelledby="tituloDetalhesRequisicao">
-        <div class="bg-slate-50 rounded-2xl shadow-2xl w-full max-w-[720px] max-h-[90vh] overflow-y-auto">
-            <!-- Cabeçalho dos detalhes -->
-            <div class="flex items-center justify-between gap-4 px-6 py-5 border-b border-slate-200">
+
+        <div class="modal-card bg-white rounded-2xl shadow-2xl w-full max-w-[720px] max-h-[90vh] overflow-y-auto">
+
+            <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100">
+
                 <div>
-                    <h3 id="tituloDetalhesRequisicao" class="text-xl font-semibold text-slate-800">
+                    <p class="text-xs font-bold uppercase tracking-widest text-blue-600">
+                        Requisição
+                    </p>
+
+                    <h3 id="tituloDetalhesRequisicao" class="text-xl font-bold text-slate-900 mt-1">
                         Detalhes da requisição
                     </h3>
+
                     <p class="text-sm text-slate-500 mt-1">
                         Informações e acompanhamento da solicitação.
                     </p>
                 </div>
 
                 <button type="button" id="botaoFecharDetalhes"
-                    class="text-slate-400 hover:text-slate-700 text-3xl font-bold leading-none"
+                    class="w-9 h-9 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 text-2xl transition"
                     aria-label="Fechar detalhes">
                     &times;
                 </button>
+
             </div>
 
             <div class="p-6">
-                <!-- Dados preenchidos pelo JavaScript -->
+
                 <div id="conteudoDetalhes" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-slate-700"></div>
 
-                <!-- Ações exclusivas do administrador -->
-                <div id="acoesAdmin" class="hidden flex flex-wrap gap-3 mt-6">
+                <div id="acoesAdmin" class="hidden flex flex-wrap gap-3 mt-6 pt-5 border-t border-slate-100">
+
                     <button type="button" id="botaoAutorizar"
-                        class="bg-green-600 text-white font-semibold px-5 py-3 rounded-lg hover:bg-green-700 transition">
+                        class="bg-green-600 text-white font-semibold px-5 py-3 rounded-xl hover:bg-green-700 transition">
                         Autorizar
                     </button>
 
                     <button type="button" id="botaoReprovar"
-                        class="bg-red-600 text-white font-semibold px-5 py-3 rounded-lg hover:bg-red-700 transition">
+                        class="bg-red-600 text-white font-semibold px-5 py-3 rounded-xl hover:bg-red-700 transition">
                         Reprovar
                     </button>
 
                     <button type="button" id="botaoFinalizar"
-                        class="bg-blue-600 text-white font-semibold px-5 py-3 rounded-lg hover:bg-blue-700 transition">
+                        class="bg-blue-600 text-white font-semibold px-5 py-3 rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-100">
                         Finalizar
                     </button>
+
                 </div>
 
                 <p id="mensagemStatus" class="text-sm mt-4" aria-live="polite"></p>
+
             </div>
+
         </div>
+
     </div>
 
     <!-- Modal de nova requisição -->
-    <div id="modalNovaRequisicao" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-        <div class="bg-slate-50 w-full max-w-[600px] max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl p-6 md:p-8">
+    <div id="modalNovaRequisicao"
+        class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
 
-            <!-- Cabeçalho -->
-            <div class="flex items-center justify-between mb-6">
+        <div class="modal-card bg-white rounded-2xl shadow-2xl w-full max-w-[600px] max-h-[90vh] overflow-y-auto">
+
+            <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100">
+
                 <div>
-                    <h3 class="text-2xl font-bold text-slate-800">
+                    <p class="text-xs font-bold uppercase tracking-widest text-blue-600">
+                        Solicitação
+                    </p>
+
+                    <h3 class="text-xl font-bold text-slate-900 mt-1">
                         Nova requisição
                     </h3>
+
                     <p class="text-sm text-slate-500 mt-1">
                         Informe os dados do material solicitado.
                     </p>
                 </div>
 
                 <button type="button" id="botaoFecharModal"
-                    class="text-slate-500 hover:text-slate-800 text-2xl leading-none"
+                    class="w-9 h-9 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 text-2xl transition"
                     aria-label="Fechar nova requisição">
                     &times;
                 </button>
+
             </div>
 
-            <!-- Formulário -->
-            <form id="formRequisicao">
+            <form id="formRequisicao" class="p-6">
 
-                <!-- Material -->
                 <div class="mb-5">
-                    <label for="material" class="block text-sm font-medium text-slate-700 mb-2">
+                    <label for="material" class="block text-sm font-semibold text-slate-700 mb-2">
                         Material
                     </label>
 
                     <select id="material"
-                        class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-orange-500">
+                        class="input-modern w-full border border-slate-200 rounded-xl p-3 outline-none bg-white">
                         <option value="">Selecione um material</option>
                     </select>
                 </div>
 
-                <!-- Quantidade -->
                 <div class="mb-5">
-                    <label for="quantidade" class="block text-sm font-medium text-slate-700 mb-2">
+                    <label for="quantidade" class="block text-sm font-semibold text-slate-700 mb-2">
                         Quantidade
                     </label>
 
                     <input type="number" id="quantidade" min="1" step="1" placeholder="Digite a quantidade"
-                        class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-orange-500">
+                        class="input-modern w-full border border-slate-200 rounded-xl p-3 outline-none">
                 </div>
 
-                <!-- Observação -->
                 <div class="mb-6">
-                    <label for="observacao" class="block text-sm font-medium text-slate-700 mb-2">
+                    <label for="observacao" class="block text-sm font-semibold text-slate-700 mb-2">
                         Observação
                     </label>
 
                     <textarea id="observacao" rows="4" placeholder="Digite uma observação, se necessário"
-                        class="w-full border border-slate-300 rounded-lg p-3 outline-none focus:border-orange-500 resize-none"></textarea>
+                        class="input-modern w-full border border-slate-200 rounded-xl p-3 outline-none resize-none"></textarea>
                 </div>
 
-                <p id="mensagemRequisicao" class="text-sm mb-4"></p>
+                <p id="mensagemRequisicao" class="text-sm mb-4" aria-live="polite"></p>
 
-                <div class="flex justify-end gap-3">
+                <div class="flex flex-wrap justify-end gap-3">
+
                     <button type="button" id="botaoCancelarNova"
-                        class="bg-slate-300 text-slate-700 font-semibold px-6 py-3 rounded-lg hover:bg-slate-400 transition">
+                        class="border border-slate-200 text-slate-600 font-semibold px-5 py-3 rounded-xl hover:bg-slate-50 transition">
                         Cancelar
                     </button>
 
                     <button type="submit" id="botaoEnviarRequisicao"
-                        class="flex items-center justify-center gap-2 bg-orange-500 text-white font-semibold px-6 py-3 rounded-lg hover:bg-orange-600 transition">
+                        class="flex items-center justify-center gap-2 bg-blue-600 text-white font-semibold px-5 py-3 rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-100">
+
                         <img src="assets/icons/send.svg" alt="" class="w-5 h-5 brightness-0 invert">
+
                         Enviar requisição
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- MODAL MEU PERFIL -->
+    <div id="modalMeuPerfil"
+        class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[80] flex items-center justify-center p-4">
+
+        <div class="modal-card bg-white rounded-2xl shadow-2xl w-full max-w-[480px]">
+
+            <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-widest text-blue-600">Minha conta</p>
+                    <h3 class="text-xl font-bold text-slate-900 mt-1">Meu perfil</h3>
+                    <p class="text-sm text-slate-500 mt-1">Consulte e atualize seus dados pessoais.</p>
+                </div>
+
+                <button type="button" id="botaoFecharPerfil"
+                    class="w-9 h-9 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 text-2xl transition">
+                    ×
+                </button>
+            </div>
+
+            <form id="formMeuPerfil" class="p-6">
+
+                <div class="mb-5">
+                    <label for="nomePerfil" class="block text-sm font-semibold text-slate-700 mb-2">
+                        Nome
+                    </label>
+                    <input type="text" id="nomePerfil" required maxlength="100"
+                        class="input-modern w-full border border-slate-200 rounded-xl p-3 outline-none">
+                </div>
+
+                <div class="mb-5">
+                    <label for="emailPerfil" class="block text-sm font-semibold text-slate-700 mb-2">
+                        E-mail
+                    </label>
+                    <input type="email" id="emailPerfil" required maxlength="150"
+                        class="input-modern w-full border border-slate-200 rounded-xl p-3 outline-none">
+                </div>
+
+                <div class="mb-5">
+                    <label for="perfilTipoUsuario" class="block text-sm font-semibold text-slate-700 mb-2">
+                        Perfil
+                    </label>
+                    <input type="text" id="perfilTipoUsuario" readonly
+                        class="w-full border border-slate-200 rounded-xl p-3 outline-none bg-slate-50 text-slate-500">
+                </div>
+
+                <p id="mensagemMeuPerfil" class="text-sm mb-5" aria-live="polite"></p>
+
+                <div class="flex flex-col-reverse sm:flex-row justify-end gap-3">
+                    <button type="button" id="botaoCancelarPerfil"
+                        class="border border-slate-200 text-slate-600 font-semibold px-5 py-3 rounded-xl hover:bg-slate-50 transition">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" id="botaoSalvarPerfil"
+                        class="bg-blue-600 text-white font-semibold px-5 py-3 rounded-xl hover:bg-blue-700 transition">
+                        Salvar alterações
                     </button>
                 </div>
+
             </form>
         </div>
     </div>
 
-    <!-- Configuração e funcionalidades -->
+    <!-- MODAL ALTERAR SENHA -->
+    <div id="modalAlterarSenha"
+        class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[80] flex items-center justify-center p-4">
+
+        <div class="modal-card bg-white rounded-2xl shadow-2xl w-full max-w-[480px] max-h-[90vh] overflow-y-auto">
+
+            <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-widest text-blue-600">Segurança</p>
+                    <h3 class="text-xl font-bold text-slate-900 mt-1">Alterar senha</h3>
+                    <p class="text-sm text-slate-500 mt-1">Defina uma nova senha para sua conta.</p>
+                </div>
+
+                <button type="button" id="botaoFecharSenha"
+                    class="w-9 h-9 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 text-2xl transition">
+                    ×
+                </button>
+            </div>
+
+            <form id="formAlterarSenha" class="p-6">
+
+                <div class="mb-5">
+                    <label for="senhaAtual" class="block text-sm font-semibold text-slate-700 mb-2">
+                        Senha atual
+                    </label>
+
+                    <div class="relative">
+                        <input type="password" id="senhaAtual" required autocomplete="current-password"
+                            class="input-modern w-full border border-slate-200 rounded-xl p-3 pr-12 outline-none">
+
+                        <button type="button" data-toggle-senha="senhaAtual"
+                            class="absolute right-3 top-1/2 -translate-y-1/2">
+                            <img src="assets/icons/eye-off.svg" alt="Mostrar senha" class="w-5 h-5">
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-5">
+                    <label for="novaSenha" class="block text-sm font-semibold text-slate-700 mb-2">
+                        Nova senha
+                    </label>
+
+                    <div class="relative">
+                        <input type="password" id="novaSenha" required minlength="6" autocomplete="new-password"
+                            class="input-modern w-full border border-slate-200 rounded-xl p-3 pr-12 outline-none">
+
+                        <button type="button" data-toggle-senha="novaSenha"
+                            class="absolute right-3 top-1/2 -translate-y-1/2">
+                            <img src="assets/icons/eye-off.svg" alt="Mostrar senha" class="w-5 h-5">
+                        </button>
+                    </div>
+
+                    <p class="text-xs text-slate-400 mt-2">A senha deve possuir pelo menos 6 caracteres.</p>
+                </div>
+
+                <div class="mb-5">
+                    <label for="confirmarNovaSenha" class="block text-sm font-semibold text-slate-700 mb-2">
+                        Confirmar nova senha
+                    </label>
+
+                    <div class="relative">
+                        <input type="password" id="confirmarNovaSenha" required autocomplete="new-password"
+                            class="input-modern w-full border border-slate-200 rounded-xl p-3 pr-12 outline-none">
+
+                        <button type="button" data-toggle-senha="confirmarNovaSenha"
+                            class="absolute right-3 top-1/2 -translate-y-1/2">
+                            <img src="assets/icons/eye-off.svg" alt="Mostrar senha" class="w-5 h-5">
+                        </button>
+                    </div>
+                </div>
+
+                <p id="mensagemAlterarSenha" class="text-sm mb-5" aria-live="polite"></p>
+
+                <div class="flex flex-col-reverse sm:flex-row justify-end gap-3">
+                    <button type="button" id="botaoCancelarSenha"
+                        class="border border-slate-200 text-slate-600 font-semibold px-5 py-3 rounded-xl hover:bg-slate-50 transition">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" id="botaoSalvarSenha"
+                        class="bg-blue-600 text-white font-semibold px-5 py-3 rounded-xl hover:bg-blue-700 transition">
+                        Alterar senha
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+
     <script src="js/config.js"></script>
     <script src="js/requisicoes.js"></script>
 

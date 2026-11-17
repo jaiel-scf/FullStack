@@ -1,2 +1,2 @@
 // Endereço do backend do SIA
-const API_URL = 'http://10.227.78.52:8080';
+const API_URL = 'http://192.168.1.67:8080';

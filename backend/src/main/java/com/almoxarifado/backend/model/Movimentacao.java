@@ -1,5 +1,7 @@
+
 package com.almoxarifado.backend.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import jakarta.persistence.Column;
@@ -54,6 +56,10 @@ public class Movimentacao {
     // Data da última atualização
     @Column(name = "data_atualizada")
     private Date dataAtualizada;
+
+    // Valor unitário de aquisição
+    @Column(name = "valor_unitario", precision = 14, scale = 4)
+    private BigDecimal valorUnitario;
 
     // Construtor vazio usado pelo JPA
     public Movimentacao() {
@@ -154,5 +160,13 @@ public class Movimentacao {
 
     public void setDataAtualizada(Date dataAtualizada) {
         this.dataAtualizada = dataAtualizada;
+    }
+
+    public BigDecimal getValorUnitario() {
+        return valorUnitario;
+    }
+
+    public void setValorUnitario(BigDecimal valorUnitario) {
+        this.valorUnitario = valorUnitario;
     }
 }

@@ -1,7 +1,3 @@
-// =====================================================
-// SIA - Requisições
-// =====================================================
-
 // Dados do usuário
 const token = sessionStorage.getItem("token");
 const usuarioPerfil = sessionStorage.getItem("usuarioPerfil");
@@ -22,7 +18,76 @@ const botaoSair = document.getElementById("botaoSair");
 const nomeUsuario = document.getElementById("nomeUsuario");
 const perfilUsuario = document.getElementById("perfilUsuario");
 
+// Botões do menu do usuário
+const botaoMeuPerfil = document.getElementById("botaoMeuPerfil");
+const botaoAlterarSenha = document.getElementById("botaoAlterarSenha");
+
+// Modal Meu Perfil
+const modalMeuPerfil = document.getElementById("modalMeuPerfil");
+const formMeuPerfil = document.getElementById("formMeuPerfil");
+const nomePerfil = document.getElementById("nomePerfil");
+const emailPerfil = document.getElementById("emailPerfil");
+const perfilTipoUsuario = document.getElementById("perfilTipoUsuario");
+const mensagemMeuPerfil = document.getElementById("mensagemMeuPerfil");
+const botaoFecharPerfil = document.getElementById("botaoFecharPerfil");
+const botaoCancelarPerfil = document.getElementById("botaoCancelarPerfil");
+const botaoSalvarPerfil = document.getElementById("botaoSalvarPerfil");
+
+// Modal Alterar Senha
+const modalAlterarSenha = document.getElementById("modalAlterarSenha");
+const formAlterarSenha = document.getElementById("formAlterarSenha");
+const senhaAtual = document.getElementById("senhaAtual");
+const novaSenha = document.getElementById("novaSenha");
+const confirmarNovaSenha = document.getElementById("confirmarNovaSenha");
+const mensagemAlterarSenha = document.getElementById("mensagemAlterarSenha");
+const botaoFecharSenha = document.getElementById("botaoFecharSenha");
+const botaoCancelarSenha = document.getElementById("botaoCancelarSenha");
+const botaoSalvarSenha = document.getElementById("botaoSalvarSenha");
+
+// Menu do usuário
+const areaMenuUsuario = document.getElementById("areaMenuUsuario");
+const botaoMenuUsuario = document.getElementById("botaoMenuUsuario");
+const menuConfiguracoesUsuario = document.getElementById(
+  "menuConfiguracoesUsuario",
+);
+const setaMenuUsuario = document.getElementById("setaMenuUsuario");
+const botaoSairMenu = document.getElementById("botaoSairMenu");
+
 nomeUsuario.textContent = usuarioNome || "Usuário";
+
+// Abre o menu do usuário
+function abrirMenuUsuario() {
+  menuConfiguracoesUsuario.classList.remove("hidden");
+  botaoMenuUsuario.setAttribute("aria-expanded", "true");
+  setaMenuUsuario.classList.add("rotate-180");
+}
+
+// Fecha o menu do usuário
+function fecharMenuUsuario() {
+  menuConfiguracoesUsuario.classList.add("hidden");
+  botaoMenuUsuario.setAttribute("aria-expanded", "false");
+  setaMenuUsuario.classList.remove("rotate-180");
+}
+
+// Alterna o menu
+function alternarMenuUsuario() {
+  const menuAberto = !menuConfiguracoesUsuario.classList.contains("hidden");
+
+  if (menuAberto) {
+    fecharMenuUsuario();
+  } else {
+    abrirMenuUsuario();
+  }
+}
+
+botaoMenuUsuario.addEventListener("click", alternarMenuUsuario);
+
+// Fecha ao clicar fora do menu
+document.addEventListener("click", function (event) {
+  if (!areaMenuUsuario.contains(event.target)) {
+    fecharMenuUsuario();
+  }
+});
 
 if (usuarioPerfil === "admin") {
   perfilUsuario.textContent = "Administrador";
@@ -46,7 +111,9 @@ const botaoCancelarNova = document.getElementById("botaoCancelarNova");
 const botaoFecharModal = document.getElementById("botaoFecharModal");
 
 // Modal de detalhes
-const modalDetalhesRequisicao = document.getElementById("modalDetalhesRequisicao");
+const modalDetalhesRequisicao = document.getElementById(
+  "modalDetalhesRequisicao",
+);
 const botaoFecharDetalhes = document.getElementById("botaoFecharDetalhes");
 const conteudoDetalhes = document.getElementById("conteudoDetalhes");
 const acoesAdmin = document.getElementById("acoesAdmin");
@@ -74,9 +141,15 @@ const botaoReprovar = document.getElementById("botaoReprovar");
 const botaoFinalizar = document.getElementById("botaoFinalizar");
 
 // Elementos da paginação
-const areaPaginacaoRequisicoes = document.getElementById("areaPaginacaoRequisicoes");
-const informacaoPaginacaoRequisicoes = document.getElementById("informacaoPaginacaoRequisicoes");
-const botoesPaginacaoRequisicoes = document.getElementById("botoesPaginacaoRequisicoes");
+const areaPaginacaoRequisicoes = document.getElementById(
+  "areaPaginacaoRequisicoes",
+);
+const informacaoPaginacaoRequisicoes = document.getElementById(
+  "informacaoPaginacaoRequisicoes",
+);
+const botoesPaginacaoRequisicoes = document.getElementById(
+  "botoesPaginacaoRequisicoes",
+);
 
 // Dados armazenados
 let produtosCarregados = [];
@@ -93,10 +166,6 @@ let paginaAtual = 1;
 
 // Impede ações repetidas durante uma atualização
 let atualizandoStatus = false;
-
-// -----------------------------------------------------
-// Funções auxiliares
-// -----------------------------------------------------
 
 function escaparHTML(valor) {
   return String(valor ?? "")
@@ -116,10 +185,6 @@ function tratarSessaoExpirada(resposta) {
 
   return false;
 }
-
-// -----------------------------------------------------
-// Carrega os materiais
-// -----------------------------------------------------
 
 async function carregarMateriais() {
   try {
@@ -147,7 +212,9 @@ async function carregarMateriais() {
     produtosCarregados = dados;
 
     produtosCarregados.sort(function (a, b) {
-      return String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR", { sensitivity: "base" });
+      return String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR", {
+        sensitivity: "base",
+      });
     });
 
     campoMaterial.innerHTML = '<option value="">Selecione um material</option>';
@@ -156,7 +223,6 @@ async function carregarMateriais() {
       const opcao = document.createElement("option");
 
       opcao.value = produto.id;
-
       opcao.textContent = `${produto.nome} - Disponível: ${produto.quantidade ?? 0}`;
 
       campoMaterial.appendChild(opcao);
@@ -165,10 +231,6 @@ async function carregarMateriais() {
     console.error("Erro ao carregar materiais:", erro);
   }
 }
-
-// -----------------------------------------------------
-// Carrega usuários para identificar quem criou
-// -----------------------------------------------------
 
 async function carregarUsuarios() {
   if (usuarioPerfil !== "admin") {
@@ -202,10 +264,6 @@ async function carregarUsuarios() {
     console.error("Erro ao carregar usuários:", erro);
   }
 }
-
-// -----------------------------------------------------
-// Carrega requisições
-// -----------------------------------------------------
 
 async function carregarRequisicoes(voltarPrimeiraPagina = false) {
   mensagemLista.textContent = "Carregando requisições...";
@@ -287,10 +345,6 @@ function buscarNomeUsuario(id) {
   return `Usuário ${id ?? "-"}`;
 }
 
-// -----------------------------------------------------
-// Paginação e apresentação da tabela
-// -----------------------------------------------------
-
 function mostrarRequisicoes() {
   tabelaRequisicoes.innerHTML = "";
   mensagemLista.textContent = "";
@@ -305,24 +359,33 @@ function mostrarRequisicoes() {
   // A mensagem fica oculta quando há registros
   mensagemLista.classList.add("hidden");
 
-  const totalPaginas = Math.ceil(requisicoesFiltradas.length / REQUISICOES_POR_PAGINA);
+  const totalPaginas = Math.ceil(
+    requisicoesFiltradas.length / REQUISICOES_POR_PAGINA,
+  );
 
   // Ajusta a página se algum registro deixou de existir
   paginaAtual = Math.min(Math.max(1, paginaAtual), totalPaginas);
 
   const inicio = (paginaAtual - 1) * REQUISICOES_POR_PAGINA;
 
-  const requisicoesDaPagina = requisicoesFiltradas.slice(inicio, inicio + REQUISICOES_POR_PAGINA);
+  const requisicoesDaPagina = requisicoesFiltradas.slice(
+    inicio,
+    inicio + REQUISICOES_POR_PAGINA,
+  );
 
   requisicoesDaPagina.forEach(function (requisicao) {
     const linha = document.createElement("tr");
 
-    linha.className = "border-t border-slate-200 cursor-pointer " + "hover:bg-orange-50 focus:bg-orange-50 transition";
+    linha.className =
+      "border-t border-slate-200 cursor-pointer hover:bg-blue-50 focus:bg-blue-50 transition";
 
     // Possibilita abrir a linha pelo teclado
     linha.tabIndex = 0;
     linha.setAttribute("role", "button");
-    linha.setAttribute("aria-label", `Ver detalhes da requisição ${requisicao.codigo || requisicao.id}`);
+    linha.setAttribute(
+      "aria-label",
+      `Ver detalhes da requisição ${requisicao.codigo || requisicao.id}`,
+    );
 
     const nomeDoUsuario = buscarNomeUsuario(requisicao.usuarioId);
 
@@ -380,14 +443,23 @@ function mostrarPaginacaoRequisicoes(totalPaginas) {
 
   const primeiroRegistro = (paginaAtual - 1) * REQUISICOES_POR_PAGINA + 1;
 
-  const ultimoRegistro = Math.min(paginaAtual * REQUISICOES_POR_PAGINA, requisicoesFiltradas.length);
+  const ultimoRegistro = Math.min(
+    paginaAtual * REQUISICOES_POR_PAGINA,
+    requisicoesFiltradas.length,
+  );
 
   informacaoPaginacaoRequisicoes.textContent =
     `Mostrando ${primeiroRegistro} a ${ultimoRegistro} ` +
     `de ${requisicoesFiltradas.length} requisições ` +
     `• Página ${paginaAtual} de ${totalPaginas}`;
 
-  criarBotaoPagina("‹", paginaAtual - 1, paginaAtual === 1, false, "Página anterior");
+  criarBotaoPagina(
+    "‹",
+    paginaAtual - 1,
+    paginaAtual === 1,
+    false,
+    "Página anterior",
+  );
 
   // Exibe até cinco números de páginas
   let inicio = Math.max(1, paginaAtual - 2);
@@ -396,10 +468,22 @@ function mostrarPaginacaoRequisicoes(totalPaginas) {
   inicio = Math.max(1, fim - 4);
 
   for (let numero = inicio; numero <= fim; numero++) {
-    criarBotaoPagina(String(numero), numero, false, numero === paginaAtual, `Página ${numero}`);
+    criarBotaoPagina(
+      String(numero),
+      numero,
+      false,
+      numero === paginaAtual,
+      `Página ${numero}`,
+    );
   }
 
-  criarBotaoPagina("›", paginaAtual + 1, paginaAtual === totalPaginas, false, "Próxima página");
+  criarBotaoPagina(
+    "›",
+    paginaAtual + 1,
+    paginaAtual === totalPaginas,
+    false,
+    "Próxima página",
+  );
 }
 
 function criarBotaoPagina(texto, numeroPagina, desabilitado, ativo, descricao) {
@@ -410,13 +494,15 @@ function criarBotaoPagina(texto, numeroPagina, desabilitado, ativo, descricao) {
   botao.disabled = desabilitado;
   botao.setAttribute("aria-label", descricao);
 
-  botao.className = "min-w-10 h-10 px-3 rounded-lg border " + "font-semibold text-sm transition";
+  botao.className =
+    "min-w-10 h-10 px-3 rounded-lg border font-semibold text-sm transition";
 
   if (ativo) {
-    botao.className += " bg-orange-500 border-orange-500 text-white";
+    botao.className += " bg-blue-600 border-blue-600 text-white";
     botao.setAttribute("aria-current", "page");
   } else {
-    botao.className += " bg-white border-slate-200 text-slate-600 hover:bg-orange-50";
+    botao.className +=
+      " bg-white border-slate-200 text-slate-600 hover:bg-blue-50";
   }
 
   if (desabilitado) {
@@ -431,19 +517,21 @@ function criarBotaoPagina(texto, numeroPagina, desabilitado, ativo, descricao) {
 }
 
 function mudarPagina(novaPagina) {
-  const totalPaginas = Math.ceil(requisicoesFiltradas.length / REQUISICOES_POR_PAGINA);
+  const totalPaginas = Math.ceil(
+    requisicoesFiltradas.length / REQUISICOES_POR_PAGINA,
+  );
 
-  if (novaPagina < 1 || novaPagina > totalPaginas || novaPagina === paginaAtual) {
+  if (
+    novaPagina < 1 ||
+    novaPagina > totalPaginas ||
+    novaPagina === paginaAtual
+  ) {
     return;
   }
 
   paginaAtual = novaPagina;
   mostrarRequisicoes();
 }
-
-// -----------------------------------------------------
-// Modal de nova requisição
-// -----------------------------------------------------
 
 function abrirModalNovaRequisicao() {
   mensagemRequisicao.textContent = "";
@@ -472,10 +560,6 @@ modalNovaRequisicao.addEventListener("click", function (event) {
   }
 });
 
-// -----------------------------------------------------
-// Envia uma nova requisição
-// -----------------------------------------------------
-
 formRequisicao.addEventListener("submit", async function (event) {
   event.preventDefault();
 
@@ -484,7 +568,8 @@ formRequisicao.addEventListener("submit", async function (event) {
   const observacao = campoObservacao.value.trim();
 
   if (!produtoId || !Number.isSafeInteger(quantidade) || quantidade <= 0) {
-    mensagemRequisicao.textContent = "Selecione o material e informe uma quantidade inteira válida.";
+    mensagemRequisicao.textContent =
+      "Selecione o material e informe uma quantidade inteira válida.";
 
     mensagemRequisicao.className = "text-sm mb-4 text-red-600";
     return;
@@ -514,7 +599,8 @@ formRequisicao.addEventListener("submit", async function (event) {
     }
 
     if (!resposta.ok) {
-      mensagemRequisicao.textContent = "Não foi possível realizar a requisição.";
+      mensagemRequisicao.textContent =
+        "Não foi possível realizar a requisição.";
 
       mensagemRequisicao.className = "text-sm mb-4 text-red-600";
       return;
@@ -537,10 +623,6 @@ formRequisicao.addEventListener("submit", async function (event) {
     botaoEnviarRequisicao.disabled = false;
   }
 });
-
-// -----------------------------------------------------
-// Modal de detalhes da requisição
-// -----------------------------------------------------
 
 function abrirDetalhesRequisicao(requisicao) {
   requisicaoSelecionada = requisicao;
@@ -659,6 +741,21 @@ document.addEventListener("keydown", function (event) {
   if (event.key !== "Escape") {
     return;
   }
+  if (!modalAlterarSenha.classList.contains("hidden")) {
+    fecharModalSenha();
+    return;
+  }
+
+  if (!modalMeuPerfil.classList.contains("hidden")) {
+    fecharModalPerfil();
+    return;
+  }
+  if (!modalMeuPerfil.classList.contains("hidden")) {
+    fecharModalPerfil();
+    return;
+  }
+
+  fecharMenuUsuario();
 
   if (!modalDetalhesRequisicao.classList.contains("hidden")) {
     fecharDetalhesRequisicao();
@@ -669,10 +766,6 @@ document.addEventListener("keydown", function (event) {
     fecharModalNovaRequisicao();
   }
 });
-
-// -----------------------------------------------------
-// Filtros
-// -----------------------------------------------------
 
 function aplicarFiltros(voltarPrimeiraPagina = true) {
   const codigo = filtroCodigo.value.trim().toLowerCase();
@@ -699,7 +792,10 @@ function aplicarFiltros(voltarPrimeiraPagina = true) {
       return false;
     }
 
-    if (dataCriacao && pegarSomenteData(requisicao.dataMovimentacao) !== dataCriacao) {
+    if (
+      dataCriacao &&
+      pegarSomenteData(requisicao.dataMovimentacao) !== dataCriacao
+    ) {
       return false;
     }
 
@@ -707,7 +803,10 @@ function aplicarFiltros(voltarPrimeiraPagina = true) {
       return false;
     }
 
-    if (dataAtualizada && pegarSomenteData(requisicao.dataAtualizada) !== dataAtualizada) {
+    if (
+      dataAtualizada &&
+      pegarSomenteData(requisicao.dataAtualizada) !== dataAtualizada
+    ) {
       return false;
     }
 
@@ -754,10 +853,6 @@ botaoLimparFiltros.addEventListener("click", function () {
   aplicarFiltros(true);
 });
 
-// -----------------------------------------------------
-// Alteração de status
-// -----------------------------------------------------
-
 function atualizarBotoesStatus() {
   botaoAutorizar.classList.add("hidden");
   botaoReprovar.classList.add("hidden");
@@ -782,7 +877,11 @@ function atualizarBotoesStatus() {
 }
 
 async function alterarStatus(novoStatus) {
-  if (usuarioPerfil !== "admin" || !requisicaoSelecionada || atualizandoStatus) {
+  if (
+    usuarioPerfil !== "admin" ||
+    !requisicaoSelecionada ||
+    atualizandoStatus
+  ) {
     return;
   }
 
@@ -798,23 +897,27 @@ async function alterarStatus(novoStatus) {
   botaoFinalizar.disabled = true;
 
   try {
-    const resposta = await fetch(`${API_URL}/movimentacoes/requisicoes/${requisicaoId}/status`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+    const resposta = await fetch(
+      `${API_URL}/movimentacoes/requisicoes/${requisicaoId}/status`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          status: novoStatus,
+        }),
       },
-      body: JSON.stringify({
-        status: novoStatus,
-      }),
-    });
+    );
 
     if (tratarSessaoExpirada(resposta)) {
       return;
     }
 
     if (resposta.status === 403) {
-      mensagemStatus.textContent = "Você não tem permissão para alterar o status.";
+      mensagemStatus.textContent =
+        "Você não tem permissão para alterar o status.";
 
       mensagemStatus.className = "text-sm mt-4 text-red-600";
       return;
@@ -863,10 +966,6 @@ botaoFinalizar.addEventListener("click", function () {
   alterarStatus("FINALIZADO");
 });
 
-// -----------------------------------------------------
-// Apresentação do status
-// -----------------------------------------------------
-
 function criarStatusHtml(status) {
   const statusAtual = status || "AGUARDANDO";
 
@@ -900,10 +999,6 @@ function criarStatusHtml(status) {
   `;
 }
 
-// -----------------------------------------------------
-// Formatação de data
-// -----------------------------------------------------
-
 function formatarData(data) {
   if (!data) {
     return "-";
@@ -936,11 +1031,8 @@ function pegarSomenteData(data) {
   return `${ano}-${mes}-${dia}`;
 }
 
-// -----------------------------------------------------
-// Logout
-// -----------------------------------------------------
-
-botaoSair.addEventListener("click", function (event) {
+// Sai do sistema
+function sairDoSistema(event) {
   event.preventDefault();
 
   sessionStorage.removeItem("token");
@@ -950,16 +1042,291 @@ botaoSair.addEventListener("click", function (event) {
   sessionStorage.removeItem("primeiroAcesso");
 
   window.location.href = "login.html?logout=1";
-});
-
-// -----------------------------------------------------
-// Carregamento inicial
-// -----------------------------------------------------
-
-async function iniciarTela() {
-  await carregarMateriais();
-  await carregarUsuarios();
-  await carregarRequisicoes();
 }
 
-iniciarTela();
+botaoSair.addEventListener("click", sairDoSistema);
+botaoSairMenu.addEventListener("click", sairDoSistema);
+
+// Abre o modal Meu Perfil
+botaoMeuPerfil.addEventListener("click", function () {
+  fecharMenuUsuario();
+  abrirModalPerfil();
+});
+
+// Fecha o modal Meu Perfil
+function fecharModalPerfil() {
+  modalMeuPerfil.classList.add("hidden");
+  mensagemMeuPerfil.textContent = "";
+  formMeuPerfil.reset();
+
+  perfilTipoUsuario.value =
+    usuarioPerfil === "admin" ? "Administrador" : "Usuário";
+}
+
+// Carrega os dados do perfil
+async function abrirModalPerfil() {
+  modalMeuPerfil.classList.remove("hidden");
+  mensagemMeuPerfil.textContent = "Carregando informações...";
+  mensagemMeuPerfil.className = "text-sm mb-5 text-slate-500";
+  botaoSalvarPerfil.disabled = true;
+
+  try {
+    const resposta = await fetch(`${API_URL}/usuarios/me`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (resposta.status === 401) {
+      sairDoSistema();
+      return;
+    }
+
+    if (!resposta.ok) {
+      mensagemMeuPerfil.textContent =
+        "Não foi possível carregar os dados do perfil.";
+      mensagemMeuPerfil.className = "text-sm mb-5 text-red-600";
+      return;
+    }
+
+    const dados = await resposta.json();
+    const usuario = dados.usuario || dados;
+
+    nomePerfil.value = usuario.nome || "";
+    emailPerfil.value = usuario.email || "";
+
+    const perfil = usuario.perfil || usuario.tipoUsuario || usuario.role;
+    perfilTipoUsuario.value = perfil === "admin" ? "Administrador" : "Usuário";
+
+    mensagemMeuPerfil.textContent = "";
+  } catch (erro) {
+    console.error("Erro ao carregar perfil:", erro);
+    mensagemMeuPerfil.textContent = "Não foi possível conectar ao servidor.";
+    mensagemMeuPerfil.className = "text-sm mb-5 text-red-600";
+  } finally {
+    botaoSalvarPerfil.disabled = false;
+  }
+}
+
+// Eventos de fechamento do modal
+botaoFecharPerfil.addEventListener("click", fecharModalPerfil);
+botaoCancelarPerfil.addEventListener("click", fecharModalPerfil);
+
+modalMeuPerfil.addEventListener("click", function (event) {
+  if (event.target === modalMeuPerfil) {
+    fecharModalPerfil();
+  }
+});
+
+// Salva as alterações do perfil
+formMeuPerfil.addEventListener("submit", async function (event) {
+  event.preventDefault();
+
+  const nome = nomePerfil.value.trim();
+  const email = emailPerfil.value.trim();
+
+  if (!nome || !email) {
+    mensagemMeuPerfil.textContent = "Preencha todos os campos.";
+    mensagemMeuPerfil.className = "text-sm mb-5 text-red-600";
+    return;
+  }
+
+  botaoSalvarPerfil.disabled = true;
+  mensagemMeuPerfil.textContent = "Salvando alterações...";
+  mensagemMeuPerfil.className = "text-sm mb-5 text-slate-500";
+
+  try {
+    const resposta = await fetch(`${API_URL}/usuarios/me`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ nome, email }),
+    });
+
+    if (resposta.status === 401) {
+      sairDoSistema();
+      return;
+    }
+
+    if (!resposta.ok) {
+      const dados = await resposta.json().catch(() => ({}));
+
+      mensagemMeuPerfil.textContent =
+        dados.mensagem ||
+        dados.message ||
+        "Não foi possível atualizar o perfil.";
+
+      mensagemMeuPerfil.className = "text-sm mb-5 text-red-600";
+      return;
+    }
+
+    sessionStorage.setItem("usuarioNome", nome);
+    nomeUsuario.textContent = nome;
+
+    mensagemMeuPerfil.textContent = "Perfil atualizado com sucesso!";
+    mensagemMeuPerfil.className = "text-sm mb-5 text-green-600";
+
+    setTimeout(fecharModalPerfil, 1000);
+  } catch (erro) {
+    console.error("Erro ao atualizar perfil:", erro);
+    mensagemMeuPerfil.textContent = "Não foi possível conectar ao servidor.";
+    mensagemMeuPerfil.className = "text-sm mb-5 text-red-600";
+  } finally {
+    botaoSalvarPerfil.disabled = false;
+  }
+});
+
+// Abre o modal Alterar Senha
+botaoAlterarSenha.addEventListener("click", function () {
+  fecharMenuUsuario();
+  abrirModalSenha();
+});
+
+// Prepara o modal
+function abrirModalSenha() {
+  formAlterarSenha.reset();
+
+  document.querySelectorAll("[data-toggle-senha]").forEach(function (botao) {
+    const campo = document.getElementById(botao.dataset.toggleSenha);
+
+    if (campo) {
+      campo.type = "password";
+    }
+
+    botao.innerHTML =
+      '<img src="assets/icons/eye-off.svg" alt="Mostrar senha" class="w-5 h-5">';
+  });
+
+  mensagemAlterarSenha.textContent = "";
+  modalAlterarSenha.classList.remove("hidden");
+}
+
+// Fecha o modal
+function fecharModalSenha() {
+  modalAlterarSenha.classList.add("hidden");
+  formAlterarSenha.reset();
+  mensagemAlterarSenha.textContent = "";
+}
+
+// Eventos de fechamento
+botaoFecharSenha.addEventListener("click", fecharModalSenha);
+botaoCancelarSenha.addEventListener("click", fecharModalSenha);
+
+modalAlterarSenha.addEventListener("click", function (event) {
+  if (event.target === modalAlterarSenha) {
+    fecharModalSenha();
+  }
+});
+
+// Mostrar e ocultar senhas
+document.querySelectorAll("[data-toggle-senha]").forEach(function (botao) {
+  botao.addEventListener("click", function () {
+    const campo = document.getElementById(botao.dataset.toggleSenha);
+
+    if (!campo) return;
+
+    const senhaOculta = campo.type === "password";
+
+    campo.type = senhaOculta ? "text" : "password";
+
+    botao.innerHTML = senhaOculta
+      ? '<img src="assets/icons/eye.svg" alt="Ocultar senha" class="w-5 h-5">'
+      : '<img src="assets/icons/eye-off.svg" alt="Mostrar senha" class="w-5 h-5">';
+  });
+});
+
+formAlterarSenha.addEventListener("submit", async function (event) {
+  event.preventDefault();
+
+  const senhaAtualValor = senhaAtual.value;
+  const novaSenhaValor = novaSenha.value;
+  const confirmarSenhaValor = confirmarNovaSenha.value;
+
+  // Valida os campos
+  if (!senhaAtualValor || !novaSenhaValor || !confirmarSenhaValor) {
+    mensagemAlterarSenha.textContent = "Preencha todos os campos.";
+    mensagemAlterarSenha.className = "text-sm mb-5 text-red-600";
+    return;
+  }
+
+  if (novaSenhaValor.length < 6) {
+    mensagemAlterarSenha.textContent =
+      "A nova senha deve ter pelo menos 6 caracteres.";
+    mensagemAlterarSenha.className = "text-sm mb-5 text-red-600";
+    return;
+  }
+
+  if (novaSenhaValor !== confirmarSenhaValor) {
+    mensagemAlterarSenha.textContent =
+      "A confirmação da senha não corresponde.";
+    mensagemAlterarSenha.className = "text-sm mb-5 text-red-600";
+    return;
+  }
+
+  if (senhaAtualValor === novaSenhaValor) {
+    mensagemAlterarSenha.textContent =
+      "A nova senha deve ser diferente da senha atual.";
+    mensagemAlterarSenha.className = "text-sm mb-5 text-red-600";
+    return;
+  }
+
+  botaoSalvarSenha.disabled = true;
+  mensagemAlterarSenha.textContent = "Alterando senha...";
+  mensagemAlterarSenha.className = "text-sm mb-5 text-slate-500";
+
+  try {
+    const resposta = await fetch(`${API_URL}/usuarios/me/senha`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        senhaAtual: senhaAtualValor,
+        novaSenha: novaSenhaValor,
+      }),
+    });
+
+    if (resposta.status === 401) {
+      mensagemAlterarSenha.textContent =
+        "Sessão expirada ou senha atual incorreta.";
+      mensagemAlterarSenha.className = "text-sm mb-5 text-red-600";
+      return;
+    }
+
+    if (!resposta.ok) {
+      const dados = await resposta.json().catch(() => ({}));
+
+      mensagemAlterarSenha.textContent =
+        dados.mensagem || dados.message || "Não foi possível alterar a senha.";
+
+      mensagemAlterarSenha.className = "text-sm mb-5 text-red-600";
+      return;
+    }
+
+    mensagemAlterarSenha.textContent = "Senha alterada com sucesso!";
+    mensagemAlterarSenha.className = "text-sm mb-5 text-green-600";
+
+    setTimeout(fecharModalSenha, 1000);
+  } catch (erro) {
+    console.error("Erro ao alterar senha:", erro);
+
+    mensagemAlterarSenha.textContent = "Não foi possível conectar ao servidor.";
+
+    mensagemAlterarSenha.className = "text-sm mb-5 text-red-600";
+  } finally {
+    botaoSalvarSenha.disabled = false;
+  }
+});
+
+// CARREGAMENTO INICIAL DA TELA
+async function inicializarTelaRequisicoes() {
+  await Promise.all([carregarMateriais(), carregarUsuarios()]);
+
+  await carregarRequisicoes(true);
+}
+
+inicializarTelaRequisicoes();

@@ -59,6 +59,92 @@ public class UsuarioController {
                 .toList();
     }
 
+    // Consulta os dados do usuário autenticado
+    @GetMapping("/me")
+    public UsuarioResponse consultarMeuPerfil(
+            @AuthenticationPrincipal Jwt jwt) {
+
+        Number usuarioId = obterUsuarioId(jwt);
+
+        Usuario usuario = usuarioService.buscarPorId(
+                usuarioId.longValue());
+
+        return criarResponse(usuario);
+    }
+
+    // Atualiza o nome e o e-mail do usuário autenticado
+    @PutMapping("/me")
+    public UsuarioResponse atualizarMeuPerfil(
+            @RequestBody AtualizarPerfilRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        Number usuarioId = obterUsuarioId(jwt);
+
+        Usuario usuario = usuarioService.atualizarPerfil(
+                usuarioId.longValue(),
+                request.getNome(),
+                request.getEmail());
+
+        return criarResponse(usuario);
+    }
+
+    // Dados recebidos na alteração da senha do próprio usuário
+    public static class AlterarMinhaSenhaRequest {
+
+        private String senhaAtual;
+        private String novaSenha;
+
+        public String getSenhaAtual() {
+            return senhaAtual;
+        }
+
+        public void setSenhaAtual(String senhaAtual) {
+            this.senhaAtual = senhaAtual;
+        }
+
+        public String getNovaSenha() {
+            return novaSenha;
+        }
+
+        public void setNovaSenha(String novaSenha) {
+            this.novaSenha = novaSenha;
+        }
+    }
+
+    // Altera a senha do usuário autenticado
+    @PutMapping("/me/senha")
+    public void alterarMinhaSenha(
+            @RequestBody AlterarMinhaSenhaRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        Number usuarioId = obterUsuarioId(jwt);
+
+        usuarioService.alterarMinhaSenha(
+                usuarioId.longValue(),
+                request.getSenhaAtual(),
+                request.getNovaSenha());
+    }
+
+    // Obtém o ID do usuário autenticado pelo token
+    private Number obterUsuarioId(Jwt jwt) {
+
+        if (jwt == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Usuário não autenticado");
+        }
+
+        Number usuarioId = jwt.getClaim("id");
+
+        if (usuarioId == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Usuário inválido");
+        }
+
+        return usuarioId;
+    }
+
     // Troca a senha no primeiro acesso
     @PutMapping("/primeiro-acesso/senha")
     public void alterarSenhaPrimeiroAcesso(
@@ -189,6 +275,29 @@ public class UsuarioController {
 
         public void setNovaSenha(String novaSenha) {
             this.novaSenha = novaSenha;
+        }
+    }
+
+    // Dados recebidos na atualização do perfil
+    public static class AtualizarPerfilRequest {
+
+        private String nome;
+        private String email;
+
+        public String getNome() {
+            return nome;
+        }
+
+        public void setNome(String nome) {
+            this.nome = nome;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
         }
     }
 

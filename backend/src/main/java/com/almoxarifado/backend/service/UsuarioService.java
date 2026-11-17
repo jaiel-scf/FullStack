@@ -123,6 +123,52 @@ public class UsuarioService {
                 usuarioRepository.save(usuario);
         }
 
+        // Altera a senha do próprio usuário autenticado
+        public void alterarMinhaSenha(
+                        Long id,
+                        String senhaAtual,
+                        String novaSenha) {
+
+                Usuario usuario = usuarioRepository.findById(id)
+                                .orElseThrow(() -> new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND,
+                                                "Usuário não encontrado"));
+
+                if (!Boolean.TRUE.equals(usuario.getAtivo())) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.FORBIDDEN,
+                                        "Usuário inativo");
+                }
+
+                // Confere a senha atual
+                if (senhaAtual == null || senhaAtual.isBlank()
+                                || usuario.getSenhaHash() == null
+                                || !passwordEncoder.matches(
+                                                senhaAtual, usuario.getSenhaHash())) {
+
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "Senha atual incorreta");
+                }
+
+                // Valida a nova senha
+                validarNovaSenha(novaSenha);
+
+                // Impede repetir a senha atual
+                if (passwordEncoder.matches(
+                                novaSenha, usuario.getSenhaHash())) {
+
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "A nova senha deve ser diferente da senha atual");
+                }
+
+                // Salva a nova senha criptografada
+                usuario.setSenhaHash(passwordEncoder.encode(novaSenha));
+
+                usuarioRepository.save(usuario);
+        }
+
         // Solicita recuperação de senha por e-mail
         public void solicitarRedefinicaoSenha(String email) {
 
@@ -297,6 +343,67 @@ public class UsuarioService {
                 usuario.setPerfil(perfil);
                 usuario.setAtivo(true);
                 usuario.setPrimeiroAcesso(true);
+
+                return usuarioRepository.save(usuario);
+        }
+
+        // Busca os dados do próprio usuário
+        public Usuario buscarPorId(Long id) {
+
+                Usuario usuario = usuarioRepository.findById(id)
+                                .orElseThrow(() -> new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND,
+                                                "Usuário não encontrado"));
+
+                if (!Boolean.TRUE.equals(usuario.getAtivo())) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.FORBIDDEN,
+                                        "Usuário inativo");
+                }
+
+                return usuario;
+        }
+
+        // Atualiza o nome e o e-mail do próprio usuário
+        public Usuario atualizarPerfil(Long id, String nome, String email) {
+
+                Usuario usuario = usuarioRepository.findById(id)
+                                .orElseThrow(() -> new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND,
+                                                "Usuário não encontrado"));
+
+                if (!Boolean.TRUE.equals(usuario.getAtivo())) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.FORBIDDEN,
+                                        "Usuário inativo");
+                }
+
+                if (nome == null || nome.isBlank()) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "Informe o nome");
+                }
+
+                if (email == null || email.isBlank()) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "Informe o e-mail");
+                }
+
+                String emailTratado = email.trim().toLowerCase();
+
+                Optional<Usuario> usuarioExistente = usuarioRepository.findByEmail(emailTratado);
+
+                if (usuarioExistente.isPresent()
+                                && !usuarioExistente.get().getId().equals(id)) {
+
+                        throw new ResponseStatusException(
+                                        HttpStatus.CONFLICT,
+                                        "Este e-mail já está sendo utilizado");
+                }
+
+                usuario.setNome(nome.trim());
+                usuario.setEmail(emailTratado);
 
                 return usuarioRepository.save(usuario);
         }

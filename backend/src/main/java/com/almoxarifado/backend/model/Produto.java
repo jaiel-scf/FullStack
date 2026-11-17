@@ -1,4 +1,7 @@
+
 package com.almoxarifado.backend.model;
+
+import java.math.BigDecimal;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,6 +51,14 @@ public class Produto {
     // Indica se o produto está ativo
     @Column(name = "ativo")
     private Boolean ativo = true;
+
+    // Custo médio de aquisição
+    @Column(name = "custo_medio", precision = 14, scale = 4)
+    private BigDecimal custoMedio;
+
+    // Caminho da imagem do produto
+    @Column(name = "imagem_caminho")
+    private String imagemCaminho;
 
     // Construtor vazio
     public Produto() {
@@ -143,5 +154,21 @@ public class Produto {
 
     public void setAtivo(Boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public BigDecimal getCustoMedio() {
+        return custoMedio;
+    }
+
+    public void setCustoMedio(BigDecimal custoMedio) {
+        this.custoMedio = custoMedio;
+    }
+
+    public String getImagemCaminho() {
+        return imagemCaminho;
+    }
+
+    public void setImagemCaminho(String imagemCaminho) {
+        this.imagemCaminho = imagemCaminho;
     }
 }

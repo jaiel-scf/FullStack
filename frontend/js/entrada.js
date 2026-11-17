@@ -1,4 +1,3 @@
-
 // Dados do usuário
 const token = sessionStorage.getItem("token");
 const usuarioId = sessionStorage.getItem("usuarioId");
@@ -19,6 +18,37 @@ if (usuarioPerfil !== "admin") {
 const menuUsuarios = document.getElementById("menuUsuarios");
 const botaoSair = document.getElementById("botaoSair");
 
+// Elementos do modal Meu perfil
+const botaoMeuPerfil = document.getElementById("botaoMeuPerfil");
+const modalMeuPerfil = document.getElementById("modalMeuPerfil");
+const formMeuPerfil = document.getElementById("formMeuPerfil");
+const nomePerfil = document.getElementById("nomePerfil");
+const emailPerfil = document.getElementById("emailPerfil");
+const perfilTipoUsuario = document.getElementById("perfilTipoUsuario");
+const mensagemMeuPerfil = document.getElementById("mensagemMeuPerfil");
+const botaoFecharPerfil = document.getElementById("botaoFecharPerfil");
+const botaoCancelarPerfil = document.getElementById("botaoCancelarPerfil");
+const botaoSalvarPerfil = document.getElementById("botaoSalvarPerfil");
+
+const areaMenuUsuario = document.getElementById("areaMenuUsuario");
+const botaoMenuUsuario = document.getElementById("botaoMenuUsuario");
+const menuConfiguracoesUsuario = document.getElementById(
+  "menuConfiguracoesUsuario",
+);
+const botaoSairMenu = document.getElementById("botaoSairMenu");
+
+// Elementos do modal Alterar senha
+const botaoAlterarSenha = document.getElementById("botaoAlterarSenha");
+const modalAlterarSenha = document.getElementById("modalAlterarSenha");
+const formAlterarSenha = document.getElementById("formAlterarSenha");
+const senhaAtual = document.getElementById("senhaAtual");
+const novaSenha = document.getElementById("novaSenha");
+const confirmarNovaSenha = document.getElementById("confirmarNovaSenha");
+const mensagemAlterarSenha = document.getElementById("mensagemAlterarSenha");
+const botaoFecharSenha = document.getElementById("botaoFecharSenha");
+const botaoCancelarSenha = document.getElementById("botaoCancelarSenha");
+const botaoSalvarSenha = document.getElementById("botaoSalvarSenha");
+
 // Identificação do usuário
 const nomeUsuario = document.getElementById("nomeUsuario");
 const perfilUsuario = document.getElementById("perfilUsuario");
@@ -27,6 +57,7 @@ const perfilUsuario = document.getElementById("perfilUsuario");
 const formEntrada = document.getElementById("formEntrada");
 const produtoEntrada = document.getElementById("produtoEntrada");
 const quantidadeEntrada = document.getElementById("quantidadeEntrada");
+const valorUnitarioEntrada = document.getElementById("valorUnitarioEntrada");
 const observacaoEntrada = document.getElementById("observacaoEntrada");
 const mensagemEntrada = document.getElementById("mensagemEntrada");
 
@@ -48,12 +79,92 @@ const estoqueMinimoProduto = document.getElementById("estoqueMinimoProduto");
 const botaoGerarCodigo = document.getElementById("botaoGerarCodigo");
 const mensagemNovoProduto = document.getElementById("mensagemNovoProduto");
 
+// Elementos da imagem
+const imagemProduto = document.getElementById("imagemProduto");
+const previewImagemProduto = document.getElementById("previewImagemProduto");
+const mensagemPreviewImagem = document.getElementById("mensagemPreviewImagem");
+const botaoSelecionarImagem = document.getElementById("botaoSelecionarImagem");
+const botaoRemoverImagem = document.getElementById("botaoRemoverImagem");
+const botaoCadastrarProduto = document.getElementById("botaoCadastrarProduto");
+
 // Elementos do histórico
 const listaUltimasEntradas = document.getElementById("listaUltimasEntradas");
 const mensagemHistorico = document.getElementById("mensagemHistorico");
 const areaPaginacaoEntradas = document.getElementById("areaPaginacaoEntradas");
-const informacaoPaginacaoEntradas = document.getElementById("informacaoPaginacaoEntradas");
-const botoesPaginacaoEntradas = document.getElementById("botoesPaginacaoEntradas");
+const informacaoPaginacaoEntradas = document.getElementById(
+  "informacaoPaginacaoEntradas",
+);
+const botoesPaginacaoEntradas = document.getElementById(
+  "botoesPaginacaoEntradas",
+);
+
+// Verifica os elementos obrigarorios
+const elementosObrigatorios = [
+  menuUsuarios,
+  botaoSair,
+  nomeUsuario,
+  perfilUsuario,
+  formEntrada,
+  produtoEntrada,
+  quantidadeEntrada,
+  valorUnitarioEntrada,
+  observacaoEntrada,
+  mensagemEntrada,
+  modalNovoProduto,
+  conteudoModal,
+  botaoNovoProduto,
+  botaoFecharModal,
+  botaoCancelarNovo,
+  formNovoProduto,
+  nomeProduto,
+  codigoProduto,
+  descricaoProduto,
+  localizacaoProduto,
+  unidadeMedidaProduto,
+  estoqueMinimoProduto,
+  botaoGerarCodigo,
+  mensagemNovoProduto,
+  imagemProduto,
+  previewImagemProduto,
+  mensagemPreviewImagem,
+  botaoSelecionarImagem,
+  botaoRemoverImagem,
+  botaoCadastrarProduto,
+  listaUltimasEntradas,
+  mensagemHistorico,
+  areaPaginacaoEntradas,
+  informacaoPaginacaoEntradas,
+  botoesPaginacaoEntradas,
+  areaMenuUsuario,
+  botaoMenuUsuario,
+  menuConfiguracoesUsuario,
+  botaoSairMenu,
+  botaoMeuPerfil,
+  modalMeuPerfil,
+  formMeuPerfil,
+  nomePerfil,
+  emailPerfil,
+  perfilTipoUsuario,
+  mensagemMeuPerfil,
+  botaoFecharPerfil,
+  botaoCancelarPerfil,
+  botaoSalvarPerfil,
+  botaoAlterarSenha,
+  modalAlterarSenha,
+  formAlterarSenha,
+  senhaAtual,
+  novaSenha,
+  confirmarNovaSenha,
+  mensagemAlterarSenha,
+  botaoFecharSenha,
+  botaoCancelarSenha,
+  botaoSalvarSenha,
+];
+
+if (elementosObrigatorios.some((elemento) => !elemento)) {
+  console.error("Erro: existem elementos necessários ausentes no HTML.");
+  throw new Error("Não foi possível inicializar a tela de entrada.");
+}
 
 // Guarda os produtos
 let produtosCarregados = [];
@@ -65,6 +176,20 @@ let entradasCarregadas = [];
 const ENTRADAS_POR_PAGINA = 3;
 let paginaAtualEntradas = 1;
 
+// Configuração da imagem
+const TAMANHO_MAXIMO_IMAGEM = 5 * 1024 * 1024;
+
+const TIPOS_IMAGEM_PERMITIDOS = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/bmp",
+];
+
+let arquivoImagemSelecionado = null;
+let urlPreviewImagem = null;
+
 // Evita interpretar textos recebidos como HTML
 function escaparHTML(valor) {
   return String(valor ?? "")
@@ -75,20 +200,219 @@ function escaparHTML(valor) {
     .replace(/'/g, "&#39;");
 }
 
-// Mostra o usuário logado
-nomeUsuario.textContent = usuarioNome || "Usuário";
-perfilUsuario.textContent =
-  usuarioPerfil === "admin" ? "Administrador" : "Usuário";
+// Formata valores monetários
+function formatarMoedaEntrada(valor) {
+  const numero = Number(valor);
 
-// Mostra menu de usuários para administrador
-if (usuarioPerfil === "admin") {
-  menuUsuarios.classList.remove("hidden");
+  if (!Number.isFinite(numero)) {
+    return "-";
+  }
+
+  return numero.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 4,
+  });
 }
 
-// Busca os produtos
-async function carregarProdutos() {
+// Exibe mensagens no cadastro
+function mostrarMensagemProduto(texto, tipo = "erro") {
+  mensagemNovoProduto.textContent = texto;
+
+  const classes = {
+    erro: "text-sm mb-5 text-red-600",
+    sucesso: "text-sm mb-5 text-green-600",
+    aviso: "text-sm mb-5 text-amber-600",
+    carregando: "text-sm mb-5 text-slate-500",
+  };
+
+  mensagemNovoProduto.className = classes[tipo] || classes.erro;
+}
+
+// Exibe mensagens na entrada
+function mostrarMensagemEntrada(texto, tipo = "erro") {
+  mensagemEntrada.textContent = texto;
+
+  const classes = {
+    erro: "text-sm mt-4 text-red-600",
+    sucesso: "text-sm mt-4 text-green-600",
+    aviso: "text-sm mt-4 text-amber-600",
+    carregando: "text-sm mt-4 text-slate-500",
+  };
+
+  mensagemEntrada.className = classes[tipo] || classes.erro;
+}
+
+// Mostra o usuário logado
+nomeUsuario.textContent = usuarioNome || "Usuário";
+perfilUsuario.textContent = "Administrador";
+
+// Mostra menu de usuários para administrador
+menuUsuarios.classList.remove("hidden");
+
+// MENU DE CONFIGURAÇÕES DO USUÁRIO
+
+// ALTERAR SENHA
+
+// Exibe mensagens da alteração de senha
+function mostrarMensagemSenha(texto, tipo = "erro") {
+  const classes = {
+    erro: "text-sm mb-5 text-red-600",
+    sucesso: "text-sm mb-5 text-green-600",
+    carregando: "text-sm mb-5 text-slate-500",
+  };
+
+  mensagemAlterarSenha.textContent = texto;
+  mensagemAlterarSenha.className = classes[tipo] || classes.erro;
+}
+
+// Abre o modal
+function abrirModalSenha() {
+  menuConfiguracoesUsuario.classList.add("hidden");
+  botaoMenuUsuario.setAttribute("aria-expanded", "false");
+
+  formAlterarSenha.reset();
+  mensagemAlterarSenha.textContent = "";
+
+  modalAlterarSenha.classList.remove("hidden");
+  senhaAtual.focus();
+}
+
+// Fecha o modal
+function fecharModalSenha() {
+  modalAlterarSenha.classList.add("hidden");
+  formAlterarSenha.reset();
+  mensagemAlterarSenha.textContent = "";
+}
+
+// Abre pelo menu
+botaoAlterarSenha.addEventListener("click", abrirModalSenha);
+
+// Fecha pelo X
+botaoFecharSenha.addEventListener("click", fecharModalSenha);
+
+// Fecha pelo Cancelar
+botaoCancelarSenha.addEventListener("click", fecharModalSenha);
+
+// Fecha clicando fora
+modalAlterarSenha.addEventListener("click", function (event) {
+  if (event.target === modalAlterarSenha) {
+    fecharModalSenha();
+  }
+});
+
+// Envia a alteração de senha
+formAlterarSenha.addEventListener("submit", async function (event) {
+  event.preventDefault();
+
+  if (botaoSalvarSenha.disabled) {
+    return;
+  }
+
+  const senhaAtualValor = senhaAtual.value;
+  const novaSenhaValor = novaSenha.value;
+  const confirmarSenhaValor = confirmarNovaSenha.value;
+
+  if (!senhaAtualValor || !novaSenhaValor || !confirmarSenhaValor) {
+    mostrarMensagemSenha("Preencha todos os campos.");
+    return;
+  }
+
+  if (novaSenhaValor.length < 6) {
+    mostrarMensagemSenha("A nova senha deve ter pelo menos 6 caracteres.");
+    return;
+  }
+
+  if (novaSenhaValor !== confirmarSenhaValor) {
+    mostrarMensagemSenha("A confirmação da nova senha não corresponde.");
+    return;
+  }
+
+  if (senhaAtualValor === novaSenhaValor) {
+    mostrarMensagemSenha("A nova senha deve ser diferente da atual.");
+    return;
+  }
+
+  botaoSalvarSenha.disabled = true;
+
+  mostrarMensagemSenha("Alterando senha...", "carregando");
+
   try {
-    const resposta = await fetch(`${API_URL}/produtos/listar`, {
+    const resposta = await fetch(`${API_URL}/usuarios/me/senha`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        senhaAtual: senhaAtualValor,
+        novaSenha: novaSenhaValor,
+      }),
+    });
+
+    if (resposta.status === 401) {
+      sessionStorage.clear();
+      window.location.href = "login.html";
+      return;
+    }
+
+    if (!resposta.ok) {
+      const dadosErro = await resposta.json().catch(() => null);
+
+      throw new Error(
+        dadosErro?.detail ||
+          dadosErro?.message ||
+          "Não foi possível alterar sua senha.",
+      );
+    }
+
+    formAlterarSenha.reset();
+
+    mostrarMensagemSenha("Senha alterada com sucesso!", "sucesso");
+  } catch (erro) {
+    console.error("Erro ao alterar senha:", erro);
+
+    mostrarMensagemSenha(
+      erro.message || "Não foi possível conectar ao servidor.",
+    );
+  } finally {
+    botaoSalvarSenha.disabled = false;
+  }
+});
+
+// MEU PERFIL
+
+// Exibe mensagens do perfil
+function mostrarMensagemPerfil(texto, tipo = "erro") {
+  const classes = {
+    erro: "text-sm mb-5 text-red-600",
+    sucesso: "text-sm mb-5 text-green-600",
+    carregando: "text-sm mb-5 text-slate-500",
+  };
+
+  mensagemMeuPerfil.textContent = texto;
+  mensagemMeuPerfil.className = classes[tipo] || classes.erro;
+}
+
+// Abre o modal e consulta os dados atuais
+async function abrirMeuPerfil() {
+  menuConfiguracoesUsuario.classList.add("hidden");
+  botaoMenuUsuario.setAttribute("aria-expanded", "false");
+
+  modalMeuPerfil.classList.remove("hidden");
+
+  formMeuPerfil.reset();
+  mensagemMeuPerfil.textContent = "";
+
+  nomePerfil.focus();
+
+  mostrarMensagemPerfil("Carregando seus dados...", "carregando");
+
+  botaoSalvarPerfil.disabled = true;
+
+  try {
+    const resposta = await fetch(`${API_URL}/usuarios/me`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -102,12 +426,161 @@ async function carregarProdutos() {
     }
 
     if (!resposta.ok) {
-      mensagemEntrada.textContent =
-        "Não foi possível carregar os produtos.";
+      throw new Error("Não foi possível consultar seu perfil.");
+    }
 
-      mensagemEntrada.className =
-        "text-sm mt-4 text-red-600";
+    const usuario = await resposta.json();
+
+    nomePerfil.value = usuario.nome || "";
+    emailPerfil.value = usuario.email || "";
+    perfilTipoUsuario.value =
+      usuario.perfil === "admin" ? "Administrador" : "Usuário";
+
+    mensagemMeuPerfil.textContent = "";
+  } catch (erro) {
+    console.error("Erro ao consultar perfil:", erro);
+
+    mostrarMensagemPerfil(
+      erro.message || "Não foi possível conectar ao servidor.",
+    );
+  } finally {
+    botaoSalvarPerfil.disabled = false;
+  }
+}
+
+// Fecha o modal
+function fecharMeuPerfil() {
+  modalMeuPerfil.classList.add("hidden");
+  formMeuPerfil.reset();
+  mensagemMeuPerfil.textContent = "";
+}
+
+// Abre pelo menu
+botaoMeuPerfil.addEventListener("click", abrirMeuPerfil);
+
+// Fecha pelo X
+botaoFecharPerfil.addEventListener("click", fecharMeuPerfil);
+
+// Fecha pelo botão cancelar
+botaoCancelarPerfil.addEventListener("click", fecharMeuPerfil);
+
+// Fecha clicando fora
+modalMeuPerfil.addEventListener("click", function (event) {
+  if (event.target === modalMeuPerfil) {
+    fecharMeuPerfil();
+  }
+});
+
+// Salva as alterações
+formMeuPerfil.addEventListener("submit", async function (event) {
+  event.preventDefault();
+
+  if (botaoSalvarPerfil.disabled) {
+    return;
+  }
+
+  const nome = nomePerfil.value.trim();
+  const email = emailPerfil.value.trim();
+
+  if (!nome || !email) {
+    mostrarMensagemPerfil("Preencha todos os campos.");
+    return;
+  }
+
+  botaoSalvarPerfil.disabled = true;
+
+  mostrarMensagemPerfil("Salvando alterações...", "carregando");
+
+  try {
+    const resposta = await fetch(`${API_URL}/usuarios/me`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        nome: nome,
+        email: email,
+      }),
+    });
+
+    if (resposta.status === 401) {
+      sessionStorage.clear();
+      window.location.href = "login.html";
       return;
+    }
+
+    if (!resposta.ok) {
+      const dadosErro = await resposta.json().catch(() => null);
+
+      throw new Error(
+        dadosErro?.detail ||
+          dadosErro?.message ||
+          "Não foi possível atualizar seu perfil.",
+      );
+    }
+
+    const usuarioAtualizado = await resposta.json();
+
+    // Atualiza os dados da sessão
+    sessionStorage.setItem("usuarioNome", usuarioAtualizado.nome);
+
+    // Atualiza o cabeçalho da tela
+    nomeUsuario.textContent = usuarioAtualizado.nome;
+
+    // Atualiza os campos com os dados confirmados pelo servidor
+    nomePerfil.value = usuarioAtualizado.nome;
+    emailPerfil.value = usuarioAtualizado.email;
+
+    mostrarMensagemPerfil("Perfil atualizado com sucesso!", "sucesso");
+  } catch (erro) {
+    console.error("Erro ao atualizar perfil:", erro);
+
+    mostrarMensagemPerfil(
+      erro.message || "Não foi possível conectar ao servidor.",
+    );
+  } finally {
+    botaoSalvarPerfil.disabled = false;
+  }
+});
+
+// Abre ou fecha o menu
+botaoMenuUsuario.addEventListener("click", function () {
+  const menuAberto = !menuConfiguracoesUsuario.classList.contains("hidden");
+
+  menuConfiguracoesUsuario.classList.toggle("hidden");
+
+  botaoMenuUsuario.setAttribute("aria-expanded", String(!menuAberto));
+});
+
+// Fecha ao clicar fora
+document.addEventListener("click", function (event) {
+  if (!areaMenuUsuario.contains(event.target)) {
+    menuConfiguracoesUsuario.classList.add("hidden");
+    botaoMenuUsuario.setAttribute("aria-expanded", "false");
+  }
+});
+
+// PRODUTOS
+// Busca os produtos
+async function carregarProdutos() {
+  try {
+    const resposta = await fetch(`${API_URL}/produtos/listar`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (resposta.status === 401) {
+      sessionStorage.clear();
+      window.location.href = "login.html";
+      return false;
+    }
+
+    if (!resposta.ok) {
+      mostrarMensagemEntrada("Não foi possível carregar os produtos.");
+      return false;
     }
 
     const dados = await resposta.json();
@@ -118,42 +591,63 @@ async function carregarProdutos() {
 
     produtosCarregados = dados;
 
-    // Organiza em ordem alfabética
     produtosCarregados.sort(function (a, b) {
-      return String(a.nome || "").localeCompare(
-        String(b.nome || ""),
-        "pt-BR",
-        { sensitivity: "base" }
-      );
+      return String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR", {
+        sensitivity: "base",
+      });
     });
 
-    produtoEntrada.innerHTML =
-      '<option value="">Selecione um produto</option>';
+    produtoEntrada.innerHTML = '<option value="">Selecione um produto</option>';
 
     produtosCarregados.forEach(function (produto) {
       const opcao = document.createElement("option");
 
       opcao.value = produto.id;
-      opcao.textContent =
-        `${produto.nome} - ${produto.codigo || "Sem código"}`;
+      opcao.textContent = `${produto.nome} - ${produto.codigo || "Sem código"}`;
 
       produtoEntrada.appendChild(opcao);
     });
+
+    return true;
   } catch (erro) {
     console.error("Erro ao carregar produtos:", erro);
 
-    mensagemEntrada.textContent =
-      "Não foi possível conectar ao servidor.";
-
-    mensagemEntrada.className =
-      "text-sm mt-4 text-red-600";
+    mostrarMensagemEntrada("Não foi possível conectar ao servidor.");
+    return false;
   }
+}
+
+// MODAL DE CADASTRO
+// Limpa a imagem selecionada
+function limparImagemSelecionada() {
+  arquivoImagemSelecionado = null;
+  imagemProduto.value = "";
+
+  if (urlPreviewImagem) {
+    URL.revokeObjectURL(urlPreviewImagem);
+    urlPreviewImagem = null;
+  }
+
+  previewImagemProduto.src = "";
+  previewImagemProduto.classList.add("hidden");
+
+  mensagemPreviewImagem.classList.remove("hidden");
+  botaoRemoverImagem.classList.add("hidden");
+}
+
+// Reseta o formulário
+function resetarFormularioProduto() {
+  formNovoProduto.reset();
+  mensagemNovoProduto.textContent = "";
+  mensagemNovoProduto.className = "text-sm mb-5";
+
+  limparImagemSelecionada();
 }
 
 // Abre modal de novo produto
 function abrirModal() {
-  formNovoProduto.reset();
-  mensagemNovoProduto.textContent = "";
+  resetarFormularioProduto();
+
   modalNovoProduto.classList.remove("hidden");
   nomeProduto.focus();
 }
@@ -161,8 +655,7 @@ function abrirModal() {
 // Fecha modal de novo produto
 function fecharModal() {
   modalNovoProduto.classList.add("hidden");
-  formNovoProduto.reset();
-  mensagemNovoProduto.textContent = "";
+  resetarFormularioProduto();
 }
 
 // Botão novo produto
@@ -181,17 +674,110 @@ modalNovoProduto.addEventListener("click", function (event) {
   }
 });
 
-// Fecha com ESC
+// Fecha os menus e modais com ESC
 document.addEventListener("keydown", function (event) {
-  if (
-    event.key === "Escape" &&
-    !modalNovoProduto.classList.contains("hidden")
-  ) {
+  if (event.key !== "Escape") {
+    return;
+  }
+
+  if (!modalMeuPerfil.classList.contains("hidden")) {
+    fecharMeuPerfil();
+  }
+
+  if (!modalNovoProduto.classList.contains("hidden")) {
     fecharModal();
+  }
+
+  if (!menuConfiguracoesUsuario.classList.contains("hidden")) {
+    menuConfiguracoesUsuario.classList.add("hidden");
+    botaoMenuUsuario.setAttribute("aria-expanded", "false");
   }
 });
 
-// Gera código automático
+// Abre seletor de imagem
+botaoSelecionarImagem.addEventListener("click", function () {
+  imagemProduto.click();
+});
+
+// Seleciona e valida a imagem
+imagemProduto.addEventListener("change", function () {
+  const arquivo = imagemProduto.files[0];
+
+  if (!arquivo) {
+    limparImagemSelecionada();
+    return;
+  }
+
+  if (!TIPOS_IMAGEM_PERMITIDOS.includes(arquivo.type)) {
+    limparImagemSelecionada();
+
+    mostrarMensagemProduto(
+      "Formato inválido. Selecione uma imagem JPG, PNG, GIF ou BMP.",
+    );
+
+    return;
+  }
+
+  if (arquivo.size > TAMANHO_MAXIMO_IMAGEM) {
+    limparImagemSelecionada();
+
+    mostrarMensagemProduto("A imagem deve ter no máximo 5 MB.");
+
+    return;
+  }
+
+  if (urlPreviewImagem) {
+    URL.revokeObjectURL(urlPreviewImagem);
+  }
+
+  arquivoImagemSelecionado = arquivo;
+  urlPreviewImagem = URL.createObjectURL(arquivo);
+
+  previewImagemProduto.src = urlPreviewImagem;
+  previewImagemProduto.classList.remove("hidden");
+
+  mensagemPreviewImagem.classList.add("hidden");
+  botaoRemoverImagem.classList.remove("hidden");
+
+  mensagemNovoProduto.textContent = "";
+});
+
+// Remove imagem selecionada
+botaoRemoverImagem.addEventListener("click", function () {
+  limparImagemSelecionada();
+  mensagemNovoProduto.textContent = "";
+});
+
+// Envia a imagem do produto
+async function enviarImagemProduto(produtoId, arquivo) {
+  const formulario = new FormData();
+
+  formulario.append("arquivo", arquivo);
+
+  const resposta = await fetch(`${API_URL}/produtos/${produtoId}/imagem`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formulario,
+  });
+
+  if (resposta.status === 401) {
+    sessionStorage.clear();
+    window.location.href = "login.html";
+    throw new Error("Sessão expirada.");
+  }
+
+  if (!resposta.ok) {
+    const erro = await resposta.text();
+
+    console.error("ERRO AO ENVIAR IMAGEM:", resposta.status, erro);
+
+    throw new Error(`Erro ${resposta.status}: ${erro}`);
+  }
+}
+
+// GERAÇÃO DO CÓDIGO
 function gerarCodigoProduto() {
   const agora = new Date();
 
@@ -216,9 +802,13 @@ botaoGerarCodigo.addEventListener("click", function () {
   codigoProduto.value = gerarCodigoProduto();
 });
 
-// Cadastra produto
+// CADASTRO DE PRODUTO
 formNovoProduto.addEventListener("submit", async function (event) {
   event.preventDefault();
+
+  if (botaoCadastrarProduto.disabled) {
+    return;
+  }
 
   const nome = nomeProduto.value.trim();
   const codigo = codigoProduto.value.trim().toUpperCase();
@@ -227,7 +817,6 @@ formNovoProduto.addEventListener("submit", async function (event) {
   const unidadeMedida = unidadeMedidaProduto.value;
   const estoqueMinimo = estoqueMinimoProduto.value;
 
-  // Valida campos
   if (
     !nome ||
     !codigo ||
@@ -235,45 +824,38 @@ formNovoProduto.addEventListener("submit", async function (event) {
     !unidadeMedida ||
     estoqueMinimo === ""
   ) {
-    mensagemNovoProduto.textContent =
-      "Preencha os campos obrigatórios.";
-
-    mensagemNovoProduto.className =
-      "text-sm mb-5 text-red-600";
+    mostrarMensagemProduto("Preencha os campos obrigatórios.");
     return;
   }
 
-  // Impede estoque mínimo negativo ou fracionado
   if (
     !Number.isSafeInteger(Number(estoqueMinimo)) ||
     Number(estoqueMinimo) < 0
   ) {
-    mensagemNovoProduto.textContent =
-      "O estoque mínimo deve ser um número inteiro e não negativo.";
-
-    mensagemNovoProduto.className =
-      "text-sm mb-5 text-red-600";
+    mostrarMensagemProduto(
+      "O estoque mínimo deve ser um número inteiro e não negativo.",
+    );
     return;
   }
 
-  // Verifica código repetido
   const codigoExiste = produtosCarregados.some(function (produto) {
     return String(produto.codigo || "").toUpperCase() === codigo;
   });
 
   if (codigoExiste) {
-    mensagemNovoProduto.textContent =
-      "Já existe um produto com esse código.";
-
-    mensagemNovoProduto.className =
-      "text-sm mb-5 text-red-600";
+    mostrarMensagemProduto("Já existe um produto com esse código.");
     return;
   }
 
-  mensagemNovoProduto.textContent = "Cadastrando produto...";
-  mensagemNovoProduto.className = "text-sm mb-5 text-slate-500";
+  const imagemSelecionada = arquivoImagemSelecionado;
+
+  botaoCadastrarProduto.disabled = true;
+  botaoCadastrarProduto.classList.add("opacity-60", "cursor-not-allowed");
+
+  mostrarMensagemProduto("Cadastrando produto...", "carregando");
 
   try {
+    // Primeiro cadastra o produto
     const resposta = await fetch(`${API_URL}/produtos/registrar`, {
       method: "POST",
       headers: {
@@ -291,81 +873,133 @@ formNovoProduto.addEventListener("submit", async function (event) {
       }),
     });
 
-    if (resposta.status === 403) {
-      mensagemNovoProduto.textContent =
-        "Apenas administradores podem cadastrar produtos.";
+    if (resposta.status === 401) {
+      sessionStorage.clear();
+      window.location.href = "login.html";
+      return;
+    }
 
-      mensagemNovoProduto.className =
-        "text-sm mb-5 text-red-600";
+    if (resposta.status === 403) {
+      mostrarMensagemProduto(
+        "Apenas administradores podem cadastrar produtos.",
+      );
       return;
     }
 
     if (!resposta.ok) {
-      mensagemNovoProduto.textContent =
-        "Não foi possível cadastrar o produto.";
-
-      mensagemNovoProduto.className =
-        "text-sm mb-5 text-red-600";
+      mostrarMensagemProduto("Não foi possível cadastrar o produto.");
       return;
     }
 
     const produtoCriado = await resposta.json();
 
-    // Atualiza a lista
-    await carregarProdutos();
+    if (!produtoCriado || !produtoCriado.id) {
+      throw new Error(
+        "O produto foi cadastrado, mas o servidor não retornou sua identificação.",
+      );
+    }
 
-    // Seleciona o produto criado
+    // Atualiza a lista de produtos
+    const produtosAtualizados = await carregarProdutos();
+
+    if (!produtosAtualizados) {
+      fecharModal();
+
+      mostrarMensagemEntrada(
+        "Produto cadastrado. Não foi possível atualizar a lista de produtos.",
+        "aviso",
+      );
+
+      return;
+    }
+
     produtoEntrada.value = produtoCriado.id;
+
+    // Envia a imagem somente depois do cadastro
+    if (imagemSelecionada) {
+      mostrarMensagemProduto("Enviando imagem...", "carregando");
+
+      try {
+        await enviarImagemProduto(produtoCriado.id, imagemSelecionada);
+
+        fecharModal();
+
+        mostrarMensagemEntrada(
+          "Produto cadastrado com imagem. Agora informe a quantidade recebida.",
+          "sucesso",
+        );
+      } catch (erroImagem) {
+        console.error("Erro ao enviar imagem:", erroImagem);
+
+        if (erroImagem.message === "Sessão expirada.") {
+          return;
+        }
+
+        fecharModal();
+
+        mostrarMensagemEntrada(
+          "Produto cadastrado, mas a imagem não foi enviada. Você poderá adicioná-la posteriormente no Estoque.",
+          "aviso",
+        );
+      }
+
+      return;
+    }
 
     fecharModal();
 
-    mensagemEntrada.textContent =
-      "Produto cadastrado. Agora informe a quantidade recebida.";
-
-    mensagemEntrada.className =
-      "text-sm mt-4 text-green-600";
+    mostrarMensagemEntrada(
+      "Produto cadastrado. Agora informe a quantidade recebida.",
+      "sucesso",
+    );
   } catch (erro) {
     console.error("Erro ao cadastrar produto:", erro);
 
-    mensagemNovoProduto.textContent =
-      "Não foi possível conectar ao servidor.";
+    mostrarMensagemProduto(
+      erro.message || "Não foi possível conectar ao servidor.",
+    );
+  } finally {
+    botaoCadastrarProduto.disabled = false;
 
-    mensagemNovoProduto.className =
-      "text-sm mb-5 text-red-600";
+    botaoCadastrarProduto.classList.remove("opacity-60", "cursor-not-allowed");
   }
 });
 
-// Registra entrada
+// REGISTRO DE ENTRADA
+
 formEntrada.addEventListener("submit", async function (event) {
   event.preventDefault();
 
   const produtoId = produtoEntrada.value;
   const quantidade = quantidadeEntrada.value;
+  const valorUnitario = Number(valorUnitarioEntrada.value);
   const observacao = observacaoEntrada.value.trim();
 
-  if (!produtoId || !quantidade) {
-    mensagemEntrada.textContent =
-      "Selecione o produto e informe a quantidade.";
-
-    mensagemEntrada.className =
-      "text-sm mt-4 text-red-600";
+  if (!produtoId || !quantidade || valorUnitarioEntrada.value === "") {
+    mostrarMensagemEntrada(
+      "Selecione o produto e informe a quantidade e o custo unitário.",
+    );
     return;
   }
 
-  if (
-    !Number.isSafeInteger(Number(quantidade)) ||
-    Number(quantidade) <= 0
-  ) {
-    mensagemEntrada.textContent =
-      "A quantidade deve ser um número inteiro maior que zero.";
-
-    mensagemEntrada.className =
-      "text-sm mt-4 text-red-600";
+  if (!Number.isSafeInteger(Number(quantidade)) || Number(quantidade) <= 0) {
+    mostrarMensagemEntrada(
+      "A quantidade deve ser um número inteiro maior que zero.",
+    );
     return;
   }
 
-  mensagemEntrada.textContent = "Registrando entrada...";
-  mensagemEntrada.className = "text-sm mt-4 text-slate-500";
+  if (!Number.isFinite(valorUnitario) || valorUnitario <= 0) {
+    mostrarMensagemEntrada("Informe um custo unitário maior que zero.");
+    return;
+  }
+
+  const botaoRegistrar = formEntrada.querySelector('button[type="submit"]');
+
+  botaoRegistrar.disabled = true;
+  botaoRegistrar.classList.add("opacity-60", "cursor-not-allowed");
+
+  mostrarMensagemEntrada("Registrando entrada...", "carregando");
 
   try {
     const resposta = await fetch(`${API_URL}/movimentacoes/registrar`, {
@@ -379,25 +1013,26 @@ formEntrada.addEventListener("submit", async function (event) {
         usuarioId: Number(usuarioId),
         tipo: "ENTRADA",
         quantidade: Number(quantidade),
+        valorUnitario: valorUnitario,
         observacao: observacao,
       }),
     });
 
-    if (resposta.status === 403) {
-      mensagemEntrada.textContent =
-        "Apenas administradores podem registrar entradas.";
+    if (resposta.status === 401) {
+      sessionStorage.clear();
+      window.location.href = "login.html";
+      return;
+    }
 
-      mensagemEntrada.className =
-        "text-sm mt-4 text-red-600";
+    if (resposta.status === 403) {
+      mostrarMensagemEntrada(
+        "Apenas administradores podem registrar entradas.",
+      );
       return;
     }
 
     if (!resposta.ok) {
-      mensagemEntrada.textContent =
-        "Não foi possível registrar a entrada.";
-
-      mensagemEntrada.className =
-        "text-sm mt-4 text-red-600";
+      mostrarMensagemEntrada("Não foi possível registrar a entrada.");
       return;
     }
 
@@ -405,29 +1040,21 @@ formEntrada.addEventListener("submit", async function (event) {
 
     await carregarProdutos();
 
-    mensagemEntrada.textContent =
-      "Entrada registrada com sucesso!";
+    mostrarMensagemEntrada("Entrada registrada com sucesso!", "sucesso");
 
-    mensagemEntrada.className =
-      "text-sm mt-4 text-green-600";
-
-    // Atualiza o histórico sem precisar sair da página
     await carregarUltimasEntradas(true);
   } catch (erro) {
     console.error("Erro ao registrar entrada:", erro);
 
-    mensagemEntrada.textContent =
-      "Não foi possível conectar ao servidor.";
+    mostrarMensagemEntrada("Não foi possível conectar ao servidor.");
+  } finally {
+    botaoRegistrar.disabled = false;
 
-    mensagemEntrada.className =
-      "text-sm mt-4 text-red-600";
+    botaoRegistrar.classList.remove("opacity-60", "cursor-not-allowed");
   }
 });
 
-// ---------------------------------------------------
 // HISTÓRICO DAS ÚLTIMAS ENTRADAS
-// ---------------------------------------------------
-
 // Encontra a data em formatos comuns de movimentação
 function obterDataEntrada(entrada) {
   return (
@@ -464,8 +1091,7 @@ function formatarDataEntrada(valor) {
 
 // Obtém a identificação do produto
 function obterNomeProdutoEntrada(entrada) {
-  const nomeDireto =
-    entrada.produtoNome ?? entrada.nomeProduto;
+  const nomeDireto = entrada.produtoNome ?? entrada.nomeProduto;
 
   if (nomeDireto) {
     return String(nomeDireto);
@@ -475,11 +1101,10 @@ function obterNomeProdutoEntrada(entrada) {
     return String(entrada.produto.nome);
   }
 
-  const id =
-    entrada.produtoId ?? entrada.produto?.id;
+  const id = entrada.produtoId ?? entrada.produto?.id;
 
   const produtoLocal = produtosCarregados.find(
-    (produto) => String(produto.id) === String(id)
+    (produto) => String(produto.id) === String(id),
   );
 
   return produtoLocal?.nome ?? `Produto #${id ?? "-"}`;
@@ -498,19 +1123,15 @@ function obterResponsavelEntrada(entrada) {
 // Busca o histórico completo no backend
 async function carregarUltimasEntradas(voltarPrimeiraPagina = false) {
   mensagemHistorico.classList.remove("hidden");
-  mensagemHistorico.textContent =
-    "Carregando últimas entradas...";
+  mensagemHistorico.textContent = "Carregando últimas entradas...";
 
   try {
-    const resposta = await fetch(
-      `${API_URL}/movimentacoes/listar`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const resposta = await fetch(`${API_URL}/movimentacoes/listar`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (resposta.status === 401) {
       sessionStorage.clear();
@@ -519,26 +1140,19 @@ async function carregarUltimasEntradas(voltarPrimeiraPagina = false) {
     }
 
     if (!resposta.ok) {
-      throw new Error(
-        `Erro ao consultar histórico (${resposta.status}).`
-      );
+      throw new Error(`Erro ao consultar histórico (${resposta.status}).`);
     }
 
     const dados = await resposta.json();
 
     if (!Array.isArray(dados)) {
-      throw new Error(
-        "O servidor não retornou uma lista de movimentações."
-      );
+      throw new Error("O servidor não retornou uma lista de movimentações.");
     }
 
-    // Mantém apenas as movimentações de entrada
     entradasCarregadas = dados.filter(function (movimentacao) {
-      return String(movimentacao.tipo ?? "").toUpperCase() ===
-        "ENTRADA";
+      return String(movimentacao.tipo ?? "").toUpperCase() === "ENTRADA";
     });
 
-    // Ordena as entradas mais recentes primeiro
     entradasCarregadas.sort(function (a, b) {
       const dataA = new Date(obterDataEntrada(a) ?? 0).getTime();
       const dataB = new Date(obterDataEntrada(b) ?? 0).getTime();
@@ -567,8 +1181,8 @@ async function carregarUltimasEntradas(voltarPrimeiraPagina = false) {
     mensagemHistorico.classList.remove("hidden");
     mensagemHistorico.textContent =
       "Não foi possível carregar o histórico de entradas.";
-    mensagemHistorico.className =
-      "text-sm text-red-600 text-center py-5";
+
+    mensagemHistorico.className = "text-sm text-red-600 text-center py-5";
   }
 }
 
@@ -578,11 +1192,10 @@ function mostrarUltimasEntradas() {
 
   if (entradasCarregadas.length === 0) {
     mensagemHistorico.classList.remove("hidden");
-    mensagemHistorico.textContent =
-      "Nenhuma entrada registrada.";
 
-    mensagemHistorico.className =
-      "text-sm text-slate-500 text-center py-5";
+    mensagemHistorico.textContent = "Nenhuma entrada registrada.";
+
+    mensagemHistorico.className = "text-sm text-slate-500 text-center py-5";
 
     areaPaginacaoEntradas.classList.add("hidden");
     return;
@@ -591,36 +1204,38 @@ function mostrarUltimasEntradas() {
   mensagemHistorico.classList.add("hidden");
 
   const totalPaginas = Math.ceil(
-    entradasCarregadas.length / ENTRADAS_POR_PAGINA
+    entradasCarregadas.length / ENTRADAS_POR_PAGINA,
   );
 
   paginaAtualEntradas = Math.min(
     Math.max(1, paginaAtualEntradas),
-    totalPaginas
+    totalPaginas,
   );
 
-  const inicio =
-    (paginaAtualEntradas - 1) * ENTRADAS_POR_PAGINA;
+  const inicio = (paginaAtualEntradas - 1) * ENTRADAS_POR_PAGINA;
 
   const entradasDaPagina = entradasCarregadas.slice(
     inicio,
-    inicio + ENTRADAS_POR_PAGINA
+    inicio + ENTRADAS_POR_PAGINA,
   );
 
   entradasDaPagina.forEach(function (entrada) {
     const produto = obterNomeProdutoEntrada(entrada);
-    const quantidade = entrada.quantidade ?? 0;
-    const data = formatarDataEntrada(
-      obterDataEntrada(entrada)
-    );
+    const quantidade = Number(entrada.quantidade ?? 0);
+    const data = formatarDataEntrada(obterDataEntrada(entrada));
     const responsavel = obterResponsavelEntrada(entrada);
     const observacao = String(entrada.observacao ?? "").trim();
+
+    const valorUnitario = Number(entrada.valorUnitario);
+
+    const custoValido = Number.isFinite(valorUnitario) && valorUnitario > 0;
+
+    const custoTotal = custoValido ? valorUnitario * quantidade : null;
 
     const card = document.createElement("div");
 
     card.className =
-      "border border-slate-200 rounded-xl p-4 " +
-      "bg-white shadow-sm";
+      "border border-slate-200 rounded-xl p-4 bg-white shadow-sm";
 
     card.innerHTML = `
       <div class="flex flex-wrap items-start justify-between gap-3">
@@ -635,9 +1250,42 @@ function mostrarUltimasEntradas() {
           </p>
         </div>
 
-        <span class="rounded-lg bg-green-100 text-green-700 px-3 py-2 font-bold whitespace-nowrap">
+        <span class="rounded-lg bg-green-100 text-green-700
+          px-3 py-2 font-bold whitespace-nowrap">
           +${escaparHTML(quantidade)}
         </span>
+
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+
+        <div class="bg-slate-50 rounded-lg p-3">
+          <p class="text-xs text-slate-500">
+            Custo unitário
+          </p>
+
+          <p class="font-semibold text-slate-800 mt-1">
+            ${
+              custoValido
+                ? formatarMoedaEntrada(valorUnitario)
+                : "Não informado"
+            }
+          </p>
+        </div>
+
+        <div class="bg-green-50 rounded-lg p-3">
+          <p class="text-xs text-slate-500">
+            Custo total da entrada
+          </p>
+
+          <p class="font-semibold text-green-700 mt-1">
+            ${
+              custoTotal !== null
+                ? formatarMoedaEntrada(custoTotal)
+                : "Não informado"
+            }
+          </p>
+        </div>
 
       </div>
 
@@ -673,18 +1321,16 @@ function mostrarPaginacaoEntradas(totalPaginas) {
 
   areaPaginacaoEntradas.classList.remove("hidden");
 
-  informacaoPaginacaoEntradas.textContent =
-    `Página ${paginaAtualEntradas} de ${totalPaginas}`;
+  informacaoPaginacaoEntradas.textContent = `Página ${paginaAtualEntradas} de ${totalPaginas}`;
 
   criarBotaoPaginacaoEntrada(
     "‹",
     paginaAtualEntradas - 1,
     paginaAtualEntradas === 1,
     false,
-    "Página anterior"
+    "Página anterior",
   );
 
-  // Até cinco números de páginas próximos da atual
   let inicio = Math.max(1, paginaAtualEntradas - 2);
   let fim = Math.min(totalPaginas, inicio + 4);
 
@@ -696,7 +1342,7 @@ function mostrarPaginacaoEntradas(totalPaginas) {
       pagina,
       false,
       pagina === paginaAtualEntradas,
-      `Página ${pagina}`
+      `Página ${pagina}`,
     );
   }
 
@@ -705,7 +1351,7 @@ function mostrarPaginacaoEntradas(totalPaginas) {
     paginaAtualEntradas + 1,
     paginaAtualEntradas === totalPaginas,
     false,
-    "Próxima página"
+    "Próxima página",
   );
 }
 
@@ -715,7 +1361,7 @@ function criarBotaoPaginacaoEntrada(
   pagina,
   desabilitado,
   ativo,
-  descricao
+  descricao,
 ) {
   const botao = document.createElement("button");
 
@@ -730,12 +1376,12 @@ function criarBotaoPaginacaoEntrada(
     "text-sm font-semibold transition";
 
   if (ativo) {
-    botao.className +=
-      " bg-green-600 border-green-600 text-white";
+    botao.className += " bg-blue-600 border-blue-600 text-white";
+
     botao.setAttribute("aria-current", "page");
   } else {
     botao.className +=
-      " bg-white border-slate-200 text-slate-600 hover:bg-green-50";
+      " bg-white border-slate-200 text-slate-600 hover:bg-blue-50";
   }
 
   if (desabilitado) {
@@ -752,7 +1398,7 @@ function criarBotaoPaginacaoEntrada(
 // Altera a página exibida
 function mudarPaginaEntradas(novaPagina) {
   const totalPaginas = Math.ceil(
-    entradasCarregadas.length / ENTRADAS_POR_PAGINA
+    entradasCarregadas.length / ENTRADAS_POR_PAGINA,
   );
 
   if (
@@ -767,8 +1413,9 @@ function mudarPaginaEntradas(novaPagina) {
   mostrarUltimasEntradas();
 }
 
-// Logout
-botaoSair.addEventListener("click", function (event) {
+// LOGOUT
+
+function sairDoSistema(event) {
   event.preventDefault();
 
   sessionStorage.removeItem("token");
@@ -778,12 +1425,69 @@ botaoSair.addEventListener("click", function (event) {
   sessionStorage.removeItem("primeiroAcesso");
 
   window.location.href = "login.html?logout=1";
-});
-
-// Carregamento inicial
-async function iniciarTelaEntradas() {
-  await carregarProdutos();
-  await carregarUltimasEntradas();
 }
 
-iniciarTelaEntradas();
+// Logout pela barra lateral
+botaoSair.addEventListener("click", sairDoSistema);
+
+// Logout pelo menu do usuário
+botaoSairMenu.addEventListener("click", sairDoSistema);
+
+// FECHAR MODAL DE ALTERAÇÃO DE SENHA COM ESC
+document.addEventListener("keydown", (evento) => {
+  if (evento.key === "Escape") {
+    if (!modalAlterarSenha.classList.contains("hidden")) {
+      fecharModalSenha();
+    }
+  }
+});
+
+// MOSTRAR OU OCULTAR SENHAS
+const iconeOlho = `
+    <svg xmlns="http://www.w3.org/2000/svg"
+        width="20" height="20" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/>
+        <circle cx="12" cy="12" r="3"/>
+    </svg>
+`;
+
+const iconeOlhoFechado = `
+    <svg xmlns="http://www.w3.org/2000/svg"
+        width="20" height="20" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <path d="m3 3 18 18"/>
+        <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/>
+        <path d="M9.9 5.2A11 11 0 0 1 12 5c6.5 0 10 7 10 7a15 15 0 0 1-4 4.7"/>
+        <path d="M6.6 6.6C3.6 8.5 2 12 2 12s3.5 7 10 7a10 10 0 0 0 3.4-.6"/>
+    </svg>
+`;
+
+document.querySelectorAll("[data-toggle-senha]").forEach((botao) => {
+  const campo = document.getElementById(botao.dataset.toggleSenha);
+
+  if (!campo) return;
+
+  // Exibe o ícone de olho inicialmente
+  botao.innerHTML = iconeOlho;
+
+  botao.addEventListener("click", () => {
+    const mostrarSenha = campo.type === "password";
+
+    campo.type = mostrarSenha ? "text" : "password";
+
+    botao.innerHTML = mostrarSenha ? iconeOlhoFechado : iconeOlho;
+
+    botao.setAttribute(
+      "aria-label",
+      mostrarSenha ? "Ocultar senha" : "Mostrar senha",
+    );
+  });
+});
+// CARREGAMENTO INICIAL DA TELA
+carregarProdutos();
+carregarUltimasEntradas(true);
