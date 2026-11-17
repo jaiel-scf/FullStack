@@ -1,0 +1,27 @@
+[33m91d7878[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdeploy/render-backend[m[33m)[m Atualiza SIA e prepara backend para deploy na Render
+ backend/.gitignore                                 |    2 [32m+[m
+ backend/Dockerfile                                 |   32 [32m+[m
+ .../backend/controller/ProdutoController.java      |   77 [32m+[m[31m-[m
+ .../backend/controller/UsuarioController.java      |  109 [32m++[m
+ .../almoxarifado/backend/model/Movimentacao.java   |   16 [32m+[m[31m-[m
+ .../com/almoxarifado/backend/model/Produto.java    |   29 [32m+[m[31m-[m
+ .../backend/repository/MovimentacaoRepository.java |   15 [32m+[m[31m-[m
+ .../backend/repository/ProdutoRepository.java      |   17 [32m+[m[31m-[m
+ .../backend/service/ImagemService.java             |  189 [32m++++[m
+ .../backend/service/MovimentacaoService.java       |  154 [32m++[m[31m-[m
+ .../backend/service/ProdutoService.java            |   65 [32m+[m[31m-[m
+ .../backend/service/UsuarioService.java            |  107 [32m++[m
+ backend/src/main/resources/application.properties  |   11 [32m+[m[31m-[m
+ frontend/assets/icons/user-round.svg               |    1 [32m+[m
+ frontend/css/style.css                             |  420 [32m+++++++[m[31m-[m
+ frontend/entrada.html                              |  945 [32m+++++++++++++[m[31m----[m
+ frontend/estoque.html                              |  733 [32m+++++++++[m[31m----[m
+ frontend/js/config.js                              |    2 [32m+[m[31m-[m
+ frontend/js/entrada.js                             | 1074 [32m++++++++++++++++[m[31m----[m
+ frontend/js/estoque.js                             | 1046 [32m+++++++++++++++++[m[31m--[m
+ frontend/js/preferencias.js                        |  134 [32m+++[m
+ frontend/js/requisicoes.js                         |  567 [32m+++++++++[m[31m--[m
+ frontend/js/usuarios.js                            |  352 [32m+++++[m[31m--[m
+ frontend/requisicoes.html                          |  690 [32m++++++++++[m[31m---[m
+ frontend/usuarios.html                             |  666 [32m+++++++++[m[31m---[m
+ 25 files changed, 6222 insertions(+), 1231 deletions(-)
