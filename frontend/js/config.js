@@ -1,2 +1,2 @@
-// Endereço do backend do SIA
-const API_URL = 'http://10.227.78.52:8080';
+// Endereço do backend do SIA (Render)
+const API_URL = 'https://sia-backend3.onrender.com';
