@@ -1,4 +1,3 @@
-
 package com.almoxarifado.backend.config;
 
 import java.util.Base64;
@@ -121,7 +120,8 @@ public class SecurityConfig {
                                                 "http://localhost:8081",
                                                 "http://127.0.0.1:8081",
                                                 "https://sia-web.up.railway.app",
-                                                "https://zesty-growth-production-1db9.up.railway.app"));
+                                                "https://zesty-growth-production-1db9.up.railway.app",
+                                                "https://sia-frontend-avz2.onrender.com"));
 
                 configuration.setAllowedMethods(
                                 List.of(
