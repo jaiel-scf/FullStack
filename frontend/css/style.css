@@ -1,4 +1,7 @@
-/* Animação da tela inicial do SIA */
+/* ========================================
+   ANIMAÇÕES DA TELA INICIAL DO SIA
+======================================== */
+
 .animacao-logo {
   animation: aparecerLogo 1s ease;
 }
@@ -43,4 +46,419 @@
   to {
     opacity: 1;
   }
+}
+
+/* ========================================
+   PREFERÊNCIAS - MODAL
+======================================== */
+
+.modal-preferencias {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(5px);
+}
+
+.modal-preferencias.hidden {
+  display: none;
+}
+
+.conteudo-preferencias {
+  width: 100%;
+  max-width: 440px;
+  padding: 28px;
+  border: 1px solid #e7edf5;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #1e293b;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.cabecalho-preferencias {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.cabecalho-preferencias h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.cabecalho-preferencias p,
+.campo-preferencias p {
+  margin-top: 6px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.fechar-preferencias {
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.campo-preferencias label {
+  display: block;
+  margin-bottom: 9px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.campo-preferencias select {
+  width: 100%;
+}
+
+.acoes-preferencias {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 28px;
+}
+
+/* ========================================
+   TEMA ESCURO - PALETA GLOBAL
+======================================== */
+
+html.tema-escuro {
+  color-scheme: dark;
+
+  --cor-fundo: #0f172a;
+  --cor-sidebar: #101b35;
+  --cor-painel: #1e293b;
+  --cor-painel-secundario: #243247;
+  --cor-campo: #172235;
+  --cor-borda: #334155;
+  --cor-texto: #f1f5f9;
+  --cor-texto-secundario: #94a3b8;
+  --cor-destaque: #6366f1;
+  --cor-hover: #273449;
+}
+
+/* ========================================
+   FUNDO GERAL
+======================================== */
+
+html.tema-escuro body,
+html.tema-escuro .main-background {
+  background-color: var(--cor-fundo) !important;
+  color: var(--cor-texto) !important;
+}
+
+html.tema-escuro main {
+  background-color: transparent !important;
+  color: var(--cor-texto) !important;
+}
+
+/* ========================================
+   MENU LATERAL
+======================================== */
+
+html.tema-escuro aside,
+html.tema-escuro .sidebar {
+  background-color: var(--cor-sidebar) !important;
+  border-color: var(--cor-borda) !important;
+  color: var(--cor-texto) !important;
+}
+
+html.tema-escuro aside h1,
+html.tema-escuro aside h2,
+html.tema-escuro aside p {
+  color: var(--cor-texto-secundario);
+}
+
+html.tema-escuro aside a {
+  color: #cbd5e1 !important;
+}
+
+html.tema-escuro aside a:hover {
+  background-color: var(--cor-hover) !important;
+  color: #ffffff !important;
+}
+
+html.tema-escuro aside a[class*="bg-"] {
+  background-color: var(--cor-hover) !important;
+  color: var(--cor-texto) !important;
+}
+
+html.tema-escuro .sidebar-link.active {
+  background: linear-gradient(110deg, #4338ca, #6366f1) !important;
+  color: #ffffff !important;
+}
+
+/* ========================================
+   PAINÉIS, CARTÕES E SUPERFÍCIES
+======================================== */
+
+html.tema-escuro .panel,
+html.tema-escuro .modal-card,
+html.tema-escuro .conteudo-preferencias,
+html.tema-escuro [class~="bg-white"],
+html.tema-escuro [class~="bg-slate-50"],
+html.tema-escuro [class~="bg-gray-50"],
+html.tema-escuro [class~="bg-gray-100"],
+html.tema-escuro [class~="bg-slate-100"] {
+  background-color: var(--cor-painel) !important;
+  border-color: var(--cor-borda) !important;
+  color: var(--cor-texto) !important;
+}
+
+/* Superfícies secundárias */
+
+html.tema-escuro [class~="bg-slate-200"],
+html.tema-escuro [class~="bg-gray-200"] {
+  background-color: var(--cor-painel-secundario) !important;
+  border-color: var(--cor-borda) !important;
+  color: var(--cor-texto) !important;
+}
+
+/* ========================================
+   TEXTOS
+======================================== */
+
+html.tema-escuro [class~="text-slate-900"],
+html.tema-escuro [class~="text-slate-800"],
+html.tema-escuro [class~="text-slate-700"],
+html.tema-escuro [class~="text-gray-900"],
+html.tema-escuro [class~="text-gray-800"],
+html.tema-escuro [class~="text-gray-700"] {
+  color: var(--cor-texto) !important;
+}
+
+html.tema-escuro [class~="text-slate-600"],
+html.tema-escuro [class~="text-slate-500"],
+html.tema-escuro [class~="text-slate-400"],
+html.tema-escuro [class~="text-gray-600"],
+html.tema-escuro [class~="text-gray-500"],
+html.tema-escuro [class~="text-gray-400"] {
+  color: var(--cor-texto-secundario) !important;
+}
+
+/* ========================================
+   BORDAS
+======================================== */
+
+html.tema-escuro [class~="border-slate-100"],
+html.tema-escuro [class~="border-slate-200"],
+html.tema-escuro [class~="border-slate-300"],
+html.tema-escuro [class~="border-gray-100"],
+html.tema-escuro [class~="border-gray-200"],
+html.tema-escuro [class~="border-gray-300"] {
+  border-color: var(--cor-borda) !important;
+}
+
+/* ========================================
+   FORMULÁRIOS
+======================================== */
+
+html.tema-escuro input,
+html.tema-escuro select,
+html.tema-escuro textarea {
+  background-color: var(--cor-campo) !important;
+  color: var(--cor-texto) !important;
+  border-color: var(--cor-borda) !important;
+}
+
+html.tema-escuro input::placeholder,
+html.tema-escuro textarea::placeholder {
+  color: var(--cor-texto-secundario) !important;
+}
+
+html.tema-escuro option {
+  background-color: var(--cor-painel);
+  color: var(--cor-texto);
+}
+
+html.tema-escuro label {
+  color: #cbd5e1;
+}
+
+/* ========================================
+   TABELAS
+======================================== */
+
+html.tema-escuro table {
+  color: var(--cor-texto) !important;
+}
+
+html.tema-escuro thead,
+html.tema-escuro th {
+  background-color: var(--cor-painel-secundario) !important;
+  color: var(--cor-texto-secundario) !important;
+  border-color: var(--cor-borda) !important;
+}
+
+html.tema-escuro td {
+  color: var(--cor-texto) !important;
+  border-color: var(--cor-borda) !important;
+}
+
+html.tema-escuro tbody tr:hover {
+  background-color: var(--cor-hover) !important;
+}
+
+/* ========================================
+   RODAPÉS
+======================================== */
+
+html.tema-escuro footer {
+  background-color: var(--cor-sidebar) !important;
+  color: var(--cor-texto-secundario) !important;
+  border-color: var(--cor-borda) !important;
+}
+
+/* ========================================
+   MENUS E DROPDOWNS
+======================================== */
+
+html.tema-escuro [role="menu"],
+html.tema-escuro .dropdown-menu {
+  background-color: var(--cor-painel) !important;
+  color: var(--cor-texto) !important;
+  border-color: var(--cor-borda) !important;
+}
+/* Mantém o texto legível ao passar o mouse no menu do usuário */
+html.tema-escuro #menuConfiguracoesUsuario button:not(#botaoSairMenu):hover {
+  color: #1e293b !important;
+}
+
+/* ========================================
+   MODAL DE PREFERÊNCIAS - TEMA ESCURO
+======================================== */
+
+html.tema-escuro .conteudo-preferencias {
+  background-color: var(--cor-painel) !important;
+  color: var(--cor-texto) !important;
+  border-color: var(--cor-borda) !important;
+}
+
+html.tema-escuro .cabecalho-preferencias p,
+html.tema-escuro .campo-preferencias p,
+html.tema-escuro .fechar-preferencias {
+  color: var(--cor-texto-secundario) !important;
+}
+
+/* ========================================
+   ESTADOS INFORMATIVOS
+======================================== */
+
+/* Avisos amarelos */
+
+html.tema-escuro [class~="bg-yellow-100"],
+html.tema-escuro [class~="bg-amber-50"] {
+  background-color: #422f16 !important;
+  color: #fde68a !important;
+}
+
+html.tema-escuro [class~="text-yellow-800"],
+html.tema-escuro [class~="text-amber-800"] {
+  color: #fde68a !important;
+}
+
+/* Status verdes */
+
+html.tema-escuro [class~="bg-green-100"] {
+  background-color: #123b30 !important;
+  color: #86efac !important;
+}
+
+html.tema-escuro [class~="text-green-800"],
+html.tema-escuro [class~="text-green-700"] {
+  color: #86efac !important;
+}
+
+/* Status vermelhos */
+
+html.tema-escuro [class~="bg-red-100"] {
+  background-color: #451f2a !important;
+  color: #fda4af !important;
+}
+
+html.tema-escuro [class~="text-red-800"] {
+  color: #fda4af !important;
+}
+
+/* Status azuis */
+
+html.tema-escuro [class~="bg-blue-100"] {
+  background-color: #1e3158 !important;
+  color: #93c5fd !important;
+}
+
+html.tema-escuro [class~="text-blue-700"],
+html.tema-escuro [class~="text-blue-800"] {
+  color: #93c5fd !important;
+}
+
+/* ========================================
+   BOTÕES NEUTROS
+======================================== */
+
+html.tema-escuro button[class~="bg-white"],
+html.tema-escuro button[class~="bg-slate-300"],
+html.tema-escuro button[class~="bg-slate-200"] {
+  background-color: var(--cor-painel-secundario) !important;
+  color: var(--cor-texto) !important;
+  border-color: var(--cor-borda) !important;
+}
+
+html.tema-escuro button[class~="bg-white"]:hover,
+html.tema-escuro button[class~="bg-slate-300"]:hover,
+html.tema-escuro button[class~="bg-slate-200"]:hover {
+  background-color: var(--cor-hover) !important;
+}
+
+/* ========================================
+   PAGINAÇÃO
+======================================== */
+
+html.tema-escuro [id*="Paginacao"] button:not([aria-current="page"]) {
+  background-color: var(--cor-painel) !important;
+  color: var(--cor-texto) !important;
+  border-color: var(--cor-borda) !important;
+}
+
+/* ========================================
+   LINKS FORA DA SIDEBAR
+======================================== */
+
+html.tema-escuro main a:not([class*="bg-"]) {
+  color: #93c5fd;
+}
+
+/* ========================================
+   SCROLLBAR
+======================================== */
+
+html.tema-escuro *::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+html.tema-escuro *::-webkit-scrollbar-track {
+  background: var(--cor-fundo);
+}
+
+html.tema-escuro *::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 10px;
+}
+
+/* ========================================
+   SELEÇÃO DE TEXTO
+======================================== */
+
+html.tema-escuro *::selection {
+  background: #4338ca;
+  color: #ffffff;
 }
