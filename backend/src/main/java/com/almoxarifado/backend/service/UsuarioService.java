@@ -349,6 +349,7 @@ public class UsuarioService {
 
         // Busca os dados do próprio usuário
         public Usuario buscarPorId(Long id) {
+
                 Usuario usuario = usuarioRepository.findById(id)
                                 .orElseThrow(() -> new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND,
@@ -365,20 +366,37 @@ public class UsuarioService {
 
         // Atualiza o nome e o e-mail do próprio usuário
         public Usuario atualizarPerfil(Long id, String nome, String email) {
-                Usuario usuario = buscarPorId(id);
+
+                Usuario usuario = usuarioRepository.findById(id)
+                                .orElseThrow(() -> new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND,
+                                                "Usuário não encontrado"));
+
+                if (!Boolean.TRUE.equals(usuario.getAtivo())) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.FORBIDDEN,
+                                        "Usuário inativo");
+                }
 
                 if (nome == null || nome.isBlank()) {
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe o nome");
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "Informe o nome");
                 }
 
                 if (email == null || email.isBlank()) {
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe o e-mail");
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "Informe o e-mail");
                 }
 
                 String emailTratado = email.trim().toLowerCase();
-                Optional<Usuario> existente = usuarioRepository.findByEmail(emailTratado);
 
-                if (existente.isPresent() && !existente.get().getId().equals(id)) {
+                Optional<Usuario> usuarioExistente = usuarioRepository.findByEmail(emailTratado);
+
+                if (usuarioExistente.isPresent()
+                                && !usuarioExistente.get().getId().equals(id)) {
+
                         throw new ResponseStatusException(
                                         HttpStatus.CONFLICT,
                                         "Este e-mail já está sendo utilizado");
@@ -386,11 +404,18 @@ public class UsuarioService {
 
                 usuario.setNome(nome.trim());
                 usuario.setEmail(emailTratado);
+
                 return usuarioRepository.save(usuario);
+        }
+
+        // Lista os usuários
+        public List<Usuario> listarTodos() {
+                return usuarioRepository.findAll();
         }
 
         // Atualiza somente o nome do usuário autenticado
         public Usuario atualizarMeuNome(Long id, String nome) {
+
                 if (nome == null || nome.trim().length() < 3 || nome.trim().length() > 120) {
                         throw new ResponseStatusException(
                                         HttpStatus.BAD_REQUEST,
@@ -398,12 +423,10 @@ public class UsuarioService {
                 }
 
                 Usuario usuario = buscarPorId(id);
+
                 usuario.setNome(nome.trim());
+
                 return usuarioRepository.save(usuario);
-        }
-    // Lista os usuários
-        public List<Usuario> listarTodos() {
-                return usuarioRepository.findAll();
         }
 
         // Inativa o usuário sem apagar seu histórico

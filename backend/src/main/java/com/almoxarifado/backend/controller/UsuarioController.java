@@ -65,7 +65,9 @@ public class UsuarioController {
             @AuthenticationPrincipal Jwt jwt) {
 
         Number usuarioId = obterUsuarioId(jwt);
-        Usuario usuario = usuarioService.buscarPorId(usuarioId.longValue());
+
+        Usuario usuario = usuarioService.buscarPorId(
+                usuarioId.longValue());
 
         return criarResponse(usuario);
     }
@@ -155,6 +157,7 @@ public class UsuarioController {
 
         return usuarioId;
     }
+
     // Troca a senha no primeiro acesso
     @PutMapping("/primeiro-acesso/senha")
     public void alterarSenhaPrimeiroAcesso(
