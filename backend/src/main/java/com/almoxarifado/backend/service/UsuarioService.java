@@ -413,6 +413,22 @@ public class UsuarioService {
                 return usuarioRepository.findAll();
         }
 
+        // Atualiza somente o nome do usuário autenticado
+        public Usuario atualizarMeuNome(Long id, String nome) {
+
+                if (nome == null || nome.trim().length() < 3 || nome.trim().length() > 120) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "Informe um nome entre 3 e 120 caracteres");
+                }
+
+                Usuario usuario = buscarPorId(id);
+
+                usuario.setNome(nome.trim());
+
+                return usuarioRepository.save(usuario);
+        }
+
         // Inativa o usuário sem apagar seu histórico
         public void excluirUsuario(Long id) {
 

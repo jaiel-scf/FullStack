@@ -88,6 +88,19 @@ public class UsuarioController {
         return criarResponse(usuario);
     }
 
+    // Atualiza somente o nome do usuário autenticado
+    @PutMapping("/meu-perfil")
+    public UsuarioResponse atualizarMeuNome(
+            @RequestBody AtualizarPerfilRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        Number usuarioId = obterUsuarioId(jwt);
+
+        return criarResponse(usuarioService.atualizarMeuNome(
+                usuarioId.longValue(),
+                request.getNome()));
+    }
+
     // Dados recebidos na alteração da senha do próprio usuário
     public static class AlterarMinhaSenhaRequest {
 
