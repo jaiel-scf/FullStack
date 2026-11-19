@@ -301,6 +301,29 @@ public class UsuarioService {
                 return usuarioRepository.save(usuario);
         }
 
+        // Atualiza somente o nome do usuário autenticado.
+        public Usuario atualizarMeuNome(Long id, String nome) {
+                if (nome == null || nome.trim().length() < 3 || nome.trim().length() > 120) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "Informe um nome entre 3 e 120 caracteres");
+                }
+
+                Usuario usuario = usuarioRepository.findById(id)
+                                .orElseThrow(() -> new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND,
+                                                "Usuário não encontrado"));
+
+                if (!Boolean.TRUE.equals(usuario.getAtivo())) {
+                        throw new ResponseStatusException(
+                                        HttpStatus.FORBIDDEN,
+                                        "Usuário inativo");
+                }
+
+                usuario.setNome(nome.trim());
+                return usuarioRepository.save(usuario);
+        }
+
         // Lista os usuários
         public List<Usuario> listarTodos() {
                 return usuarioRepository.findAll();
