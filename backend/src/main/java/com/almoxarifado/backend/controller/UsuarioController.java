@@ -59,6 +59,34 @@ public class UsuarioController {
                 .toList();
     }
 
+    // Permite alterar apenas o próprio nome, identificado pelo JWT.
+    @PutMapping("/meu-perfil")
+    public UsuarioResponse atualizarMeuPerfil(
+            @RequestBody AtualizarPerfilRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        if (jwt == null || !(jwt.getClaim("id") instanceof Number usuarioId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Usuário não autenticado");
+        }
+
+        return criarResponse(usuarioService.atualizarMeuNome(
+                usuarioId.longValue(), request.getNome()));
+    }
+
+    public static class AtualizarPerfilRequest {
+        private String nome;
+
+        public String getNome() {
+            return nome;
+        }
+
+        public void setNome(String nome) {
+            this.nome = nome;
+        }
+    }
+
     // Troca a senha no primeiro acesso
     @PutMapping("/primeiro-acesso/senha")
     public void alterarSenhaPrimeiroAcesso(
