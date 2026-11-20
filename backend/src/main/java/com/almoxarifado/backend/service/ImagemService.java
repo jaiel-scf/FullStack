@@ -172,7 +172,7 @@ public class ImagemService {
 
     private String validarNomeStorage(String caminho) {
         String nome = caminho.substring(PREFIXO_STORAGE.length());
-        if (!nome.matches("[a-fA-F0-9-]{36}\\\\.(jpg|png)")) {
+        if (!nome.matches("[a-fA-F0-9-]{36}\\.(jpg|png)")) {
             throw new IllegalArgumentException("Caminho de imagem inválido.");
         }
         return nome;
