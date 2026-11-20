@@ -35,6 +35,10 @@ public class ProdutoService {
     // Salva um produto
     public Produto salvar(Produto produto) {
 
+        if (produto.getNome() != null) {
+            produto.setNome(produto.getNome().trim().toUpperCase(java.util.Locale.forLanguageTag("pt-BR")));
+        }
+
         if (produto.getAtivo() == null) {
             produto.setAtivo(true);
         }
@@ -52,7 +56,7 @@ public class ProdutoService {
 
         Produto produto = buscarProduto(id);
 
-        produto.setNome(dadosProduto.getNome());
+        produto.setNome(dadosProduto.getNome() == null ? null : dadosProduto.getNome().trim().toUpperCase(java.util.Locale.forLanguageTag("pt-BR")));
         produto.setCodigo(dadosProduto.getCodigo());
         produto.setDescricao(dadosProduto.getDescricao());
         produto.setLocalizacao(dadosProduto.getLocalizacao());
