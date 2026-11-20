@@ -802,6 +802,11 @@ botaoGerarCodigo.addEventListener("click", function () {
   codigoProduto.value = gerarCodigoProduto();
 });
 
+// Padroniza o nome enquanto o usuário digita.
+nomeProduto.addEventListener("input", () => {
+  nomeProduto.value = nomeProduto.value.toLocaleUpperCase("pt-BR");
+});
+
 // CADASTRO DE PRODUTO
 formNovoProduto.addEventListener("submit", async function (event) {
   event.preventDefault();
@@ -810,7 +815,7 @@ formNovoProduto.addEventListener("submit", async function (event) {
     return;
   }
 
-  const nome = nomeProduto.value.trim();
+  const nome = nomeProduto.value.trim().toLocaleUpperCase("pt-BR");
   const codigo = codigoProduto.value.trim().toUpperCase();
   const descricao = descricaoProduto.value.trim();
   const localizacao = localizacaoProduto.value.trim();
