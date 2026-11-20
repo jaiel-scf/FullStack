@@ -86,6 +86,9 @@ const mensagemEditar = document.getElementById("mensagemEditar");
 
 // Campos de edição
 const editarNome = document.getElementById("editarNome");
+editarNome.addEventListener("input", () => {
+  editarNome.value = editarNome.value.toLocaleUpperCase("pt-BR");
+});
 const editarCodigo = document.getElementById("editarCodigo");
 const editarDescricao = document.getElementById("editarDescricao");
 const editarLocalizacao = document.getElementById("editarLocalizacao");
@@ -1290,7 +1293,7 @@ formEditarProduto.addEventListener("submit", async function (event) {
     return;
   }
 
-  const nome = editarNome.value.trim();
+  const nome = editarNome.value.trim().toLocaleUpperCase("pt-BR");
   const codigo = editarCodigo.value.trim().toUpperCase();
   const descricao = editarDescricao.value.trim();
   const localizacao = editarLocalizacao.value.trim();
