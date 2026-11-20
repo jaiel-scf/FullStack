@@ -6,6 +6,11 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,6 +27,17 @@ public class ImagemService {
 
     private static final long TAMANHO_MAXIMO = 5 * 1024 * 1024;
     private static final int TAMANHO_MAXIMO_IMAGEM = 1200;
+
+    @Value("${SUPABASE_URL:}")
+    private String supabaseUrl;
+
+    @Value("${SUPABASE_STORAGE_KEY:}")
+    private String supabaseKey;
+
+    private final HttpClient clienteHttp = HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.NORMAL).build();
+
+    private static final String PREFIXO_STORAGE = "storage:produtos/";
 
     @Value("${app.upload.dir:uploads/produtos}")
     private String diretorio;
@@ -89,34 +105,37 @@ public class ImagemService {
             throw new IOException("Não foi possível processar a imagem.");
         }
 
-        Path pasta = obterPasta();
-        Files.createDirectories(pasta);
-
+        validarConfiguracao();
         String nomeArquivo = UUID.randomUUID() + "." + formato;
-        Path destino = pasta.resolve(nomeArquivo);
-
-        Files.write(destino, saida.toByteArray());
-
-        return diretorio.replace("\\", "/") + "/" + nomeArquivo;
+        String tipo = formato.equals("jpg") ? "image/jpeg" : "image/png";
+        HttpRequest requisicao = requisicaoStorage(nomeArquivo)
+                .header("Content-Type", tipo)
+                .POST(HttpRequest.BodyPublishers.ofByteArray(saida.toByteArray()))
+                .build();
+        enviar(requisicao, 200, 201);
+        return PREFIXO_STORAGE + nomeArquivo;
     }
 
     public byte[] carregar(String caminho) throws IOException {
-
-        Path arquivo = resolverCaminho(caminho);
-
-        if (!Files.isRegularFile(arquivo)) {
-            throw new IOException("Imagem não encontrada.");
+        if (caminho != null && caminho.startsWith(PREFIXO_STORAGE)) {
+            validarConfiguracao();
+            String nome = validarNomeStorage(caminho);
+            HttpRequest requisicao = requisicaoStorage(nome).GET().build();
+            return enviar(requisicao, 200).body();
         }
-
+        // Compatibilidade com caminhos de imagens anteriores à migração.
+        Path arquivo = resolverCaminho(caminho);
+        if (!Files.isRegularFile(arquivo)) {
+            throw new IOException("Imagem não encontrada. Reenvie a imagem do produto.");
+        }
         return Files.readAllBytes(arquivo);
     }
 
     public String obterTipoConteudo(String caminho) {
 
-        String nome = resolverCaminho(caminho)
-                .getFileName()
-                .toString()
-                .toLowerCase();
+        String nome = caminho != null && caminho.startsWith(PREFIXO_STORAGE)
+                ? validarNomeStorage(caminho)
+                : resolverCaminho(caminho).getFileName().toString().toLowerCase();
 
         if (nome.endsWith(".jpg") || nome.endsWith(".jpeg")) {
             return "image/jpeg";
@@ -135,7 +154,50 @@ public class ImagemService {
             return;
         }
 
+        if (caminho.startsWith(PREFIXO_STORAGE)) {
+            validarConfiguracao();
+            HttpRequest requisicao = requisicaoStorage(validarNomeStorage(caminho)).DELETE().build();
+            enviar(requisicao, 200, 204);
+            return;
+        }
         Files.deleteIfExists(resolverCaminho(caminho));
+    }
+
+    private void validarConfiguracao() throws IOException {
+        if (supabaseUrl == null || supabaseUrl.isBlank()
+                || supabaseKey == null || supabaseKey.isBlank()) {
+            throw new IOException("Supabase Storage não configurado no backend.");
+        }
+    }
+
+    private String validarNomeStorage(String caminho) {
+        String nome = caminho.substring(PREFIXO_STORAGE.length());
+        if (!nome.matches("[a-fA-F0-9-]{36}\\\\.(jpg|png)")) {
+            throw new IllegalArgumentException("Caminho de imagem inválido.");
+        }
+        return nome;
+    }
+
+    private HttpRequest.Builder requisicaoStorage(String nome) {
+        String base = supabaseUrl.replaceAll("/+$", "");
+        return HttpRequest.newBuilder(URI.create(base + "/storage/v1/object/produtos/" + nome))
+                .header("apikey", supabaseKey)
+                .header("Authorization", "Bearer " + supabaseKey)
+                .timeout(java.time.Duration.ofSeconds(30));
+    }
+
+    private HttpResponse<byte[]> enviar(HttpRequest requisicao, int... codigosAceitos) throws IOException {
+        try {
+            HttpResponse<byte[]> resposta = clienteHttp.send(requisicao,
+                    HttpResponse.BodyHandlers.ofByteArray());
+            for (int codigo : codigosAceitos) {
+                if (resposta.statusCode() == codigo) return resposta;
+            }
+            throw new IOException("Falha no Supabase Storage (HTTP " + resposta.statusCode() + ").");
+        } catch (InterruptedException erro) {
+            Thread.currentThread().interrupt();
+            throw new IOException("Operação de imagem interrompida.", erro);
+        }
     }
 
     private Path obterPasta() {
