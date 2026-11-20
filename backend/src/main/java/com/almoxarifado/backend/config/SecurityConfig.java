@@ -119,6 +119,8 @@ public class SecurityConfig {
                                                 "http://10.227.77.165:5500",
                                                 "http://localhost:8081",
                                                 "http://127.0.0.1:8081",
+                                                "http://localhost:8082",
+                                                "http://127.0.0.1:8082",
                                                 "https://sia-web.up.railway.app",
                                                 "https://zesty-growth-production-1db9.up.railway.app",
                                                 "https://sia-frontend-avz2.onrender.com"));
