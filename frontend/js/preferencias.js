@@ -1,136 +1,92 @@
 const CHAVE_TEMA = "temaPreferido";
+let temaEmEdicao = null;
 
 function atualizarBotoesTema(tema) {
   for (const [id, valor] of [["temaClaro", "claro"], ["temaEscuro", "escuro"]]) {
     const botao = document.getElementById(id);
     if (!botao) continue;
-    const ativo = tema === valor;
-    botao.setAttribute("aria-pressed", String(ativo));
-    botao.style.borderColor = ativo ? "#2563eb" : "";
-    botao.style.backgroundColor = ativo ? "rgba(37,99,235,0.12)" : "";
-    botao.style.color = ativo ? "#2563eb" : "";
+    const selecionado = tema === valor;
+    botao.setAttribute("aria-pressed", String(selecionado));
+    botao.style.borderColor = selecionado ? "#2563eb" : "";
+    botao.style.backgroundColor = selecionado ? "rgba(37,99,235,0.12)" : "";
+    botao.style.color = selecionado ? "#2563eb" : "";
   }
 }
 
-// Aplica e salva o tema escolhido
-function aplicarTema(tema) {
-  const temaValido = tema === "escuro" ? "escuro" : "claro";
-
-  document.documentElement.classList.toggle(
-    "tema-escuro",
-    temaValido === "escuro",
-  );
-
-  localStorage.setItem(CHAVE_TEMA, temaValido);
-
-  atualizarBotoesTema(temaValido);
+function mostrarTema(tema) {
+  document.documentElement.classList.toggle("tema-escuro", tema === "escuro");
+  atualizarBotoesTema(tema);
 }
 
-// Aplica o tema salvo antes da página ser exibida
-aplicarTema(localStorage.getItem(CHAVE_TEMA) || "claro");
+function temaSalvo() {
+  return localStorage.getItem(CHAVE_TEMA) === "escuro" ? "escuro" : "claro";
+}
 
-// Cria a janela de preferências
+// Carrega a preferência confirmada, sem modificá-la.
+mostrarTema(temaSalvo());
+
 function criarModalPreferencias() {
-  if (document.getElementById("modalPreferencias")) {
-    return;
-  }
-
+  if (document.getElementById("modalPreferencias")) return;
   const modal = document.createElement("div");
-
   modal.id = "modalPreferencias";
   modal.className = "modal-preferencias hidden";
-
   modal.innerHTML = `
-    <div class="conteudo-preferencias">
-
+    <div class="conteudo-preferencias" role="dialog" aria-modal="true" aria-labelledby="tituloPreferencias">
       <div class="cabecalho-preferencias">
         <div>
-          <h2>Preferências</h2>
-          <p>Personalize a aparência do sistema.</p>
+          <h2 id="tituloPreferencias">Preferências</h2>
+          <p>Escolha um tema, visualize e confirme se deseja mantê-lo.</p>
         </div>
-
-        <button
-          type="button"
-          class="fechar-preferencias"
-          id="fecharPreferencias"
-          aria-label="Fechar">
-          &times;
-        </button>
+        <button type="button" class="fechar-preferencias" id="fecharPreferencias" aria-label="Cancelar e fechar">&times;</button>
       </div>
-
       <div class="campo-preferencias">
-        <label for="seletorTema">Tema do sistema</label>
-
-        <div class="flex gap-3" role="group" aria-label="Tema do sistema">
+        <label>Aparência do sistema</label>
+        <div class="flex gap-3" role="group" aria-label="Escolher tema">
           <button type="button" id="temaClaro" aria-pressed="false" class="flex-1 border border-slate-300 rounded-xl p-3 font-semibold transition">☀️ Claro</button>
           <button type="button" id="temaEscuro" aria-pressed="false" class="flex-1 border border-slate-300 rounded-xl p-3 font-semibold transition">🌙 Escuro</button>
         </div>
-
-        <p>A preferência será mantida nas próximas visitas.</p>
+        <p>A mudança será salva somente ao confirmar.</p>
       </div>
-
-      <div class="acoes-preferencias">
-        <button
-          type="button"
-          id="salvarPreferencias"
-          class="bg-indigo-600 text-white font-semibold px-5 py-3 rounded-lg hover:bg-indigo-700">
-          Salvar preferência
-        </button>
+      <div class="acoes-preferencias flex gap-3 justify-end">
+        <button type="button" id="cancelarPreferencias" class="border border-slate-300 rounded-lg px-5 py-3 font-semibold">Cancelar</button>
+        <button type="button" id="salvarPreferencias" class="bg-indigo-600 text-white font-semibold px-5 py-3 rounded-lg hover:bg-indigo-700">Confirmar tema</button>
       </div>
-
-    </div>
-  `;
-
+    </div>`;
   document.body.appendChild(modal);
-
-  atualizarBotoesTema(localStorage.getItem(CHAVE_TEMA) || "claro");
-
-  document.getElementById("temaClaro").addEventListener("click", () => {
-    aplicarTema("claro");
-    fecharPreferencias();
+  for (const [id, tema] of [["temaClaro", "claro"], ["temaEscuro", "escuro"]]) {
+    document.getElementById(id).addEventListener("click", () => {
+      temaEmEdicao = tema;
+      mostrarTema(tema);
+    });
+  }
+  document.getElementById("salvarPreferencias").addEventListener("click", () => {
+    localStorage.setItem(CHAVE_TEMA, temaEmEdicao || temaSalvo());
+    encerrarPreferencias(false);
   });
-  document.getElementById("temaEscuro").addEventListener("click", () => {
-    aplicarTema("escuro");
-    fecharPreferencias();
-  });
-  document.getElementById("fecharPreferencias").addEventListener("click", fecharPreferencias);
-
-  modal.addEventListener("click", function (event) {
-    if (event.target === modal) {
-      fecharPreferencias();
-    }
+  document.getElementById("cancelarPreferencias").addEventListener("click", () => encerrarPreferencias(true));
+  document.getElementById("fecharPreferencias").addEventListener("click", () => encerrarPreferencias(true));
+  modal.addEventListener("click", (evento) => {
+    if (evento.target === modal) encerrarPreferencias(true);
   });
 }
 
-// Abre as preferências
 function abrirPreferencias() {
   criarModalPreferencias();
-
+  temaEmEdicao = temaSalvo();
+  mostrarTema(temaEmEdicao);
   document.getElementById("modalPreferencias").classList.remove("hidden");
 }
 
-// Fecha as preferências
-function fecharPreferencias() {
-  const modal = document.getElementById("modalPreferencias");
-
-  if (modal) {
-    modal.classList.add("hidden");
-  }
+function encerrarPreferencias(cancelar) {
+  if (cancelar) mostrarTema(temaSalvo());
+  temaEmEdicao = null;
+  document.getElementById("modalPreferencias")?.classList.add("hidden");
 }
 
-// Configura os eventos da página
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
   criarModalPreferencias();
-
-  const botao = document.getElementById("botaoPreferencias");
-
-  if (botao) {
-    botao.addEventListener("click", abrirPreferencias);
-  }
-
-  document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape") {
-      fecharPreferencias();
-    }
+  document.getElementById("botaoPreferencias")?.addEventListener("click", abrirPreferencias);
+  document.addEventListener("keydown", (evento) => {
+    if (evento.key === "Escape") encerrarPreferencias(true);
   });
 });
