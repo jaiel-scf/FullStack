@@ -137,7 +137,19 @@ function itensDaRequisicao(requisicao) {
     : [{ produtoId: requisicao.produtoId, quantidade: requisicao.quantidade }];
 }
 
+function atualizarMateriaisDisponiveis() {
+  const selecionados = new Set(itensNovaRequisicao.map((item) => String(item.produtoId)));
+  for (const opcao of campoMaterial.options) {
+    if (!opcao.value) continue;
+    const incluido = selecionados.has(opcao.value);
+    opcao.hidden = incluido;
+    opcao.disabled = incluido;
+  }
+  if (selecionados.has(campoMaterial.value)) campoMaterial.value = "";
+}
+
 function renderizarItensFormulario() {
+  atualizarMateriaisDisponiveis();
   listaItensRequisicao.replaceChildren();
   contadorItens.textContent = String(itensNovaRequisicao.length);
   itensNovaRequisicao.forEach((item) => {
@@ -151,10 +163,10 @@ function renderizarItensFormulario() {
     editar.textContent = "Editar";
     editar.className = "text-blue-600 font-semibold";
     editar.onclick = () => {
-      campoMaterial.value = String(item.produtoId);
-      campoQuantidade.value = String(item.quantidade);
       itensNovaRequisicao = itensNovaRequisicao.filter((atual) => atual.produtoId !== item.produtoId);
       renderizarItensFormulario();
+      campoMaterial.value = String(item.produtoId);
+      campoQuantidade.value = String(item.quantidade);
     };
     const remover = document.createElement("button");
     remover.type = "button";
@@ -692,70 +704,51 @@ function abrirDetalhesRequisicao(requisicao) {
   mensagemStatus.className = "text-sm mt-4";
 
   const itens = itensDaRequisicao(requisicao);
-  const nomeProduto = itens.map((item) => `${buscarNomeProduto(item.produtoId)} — Qtd.: ${item.quantidade}`).join("\n");
   const nomeDoUsuario = buscarNomeUsuario(requisicao.usuarioId);
+  const linhasMateriais = itens.map((item, indice) => `
+    <div class="flex items-center justify-between gap-4 px-4 py-3 ${indice % 2 ? "bg-slate-50" : "bg-white"}">
+      <div class="flex items-center gap-3 min-w-0">
+        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-700 text-xs font-bold">${indice + 1}</span>
+        <span class="text-sm font-medium text-slate-800 break-words">${escaparHTML(buscarNomeProduto(item.produtoId))}</span>
+      </div>
+      <span class="shrink-0 rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-bold text-slate-700">${escaparHTML(String(item.quantidade))}</span>
+    </div>
+  `).join("");
 
   conteudoDetalhes.innerHTML = `
-    <div>
-      <p class="text-sm font-semibold text-slate-500 mb-1">
-        Código
-      </p>
-      <p class="font-medium text-slate-800">
-        ${escaparHTML(requisicao.codigo || "-")}
-      </p>
+    <div class="md:col-span-2 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Código da requisição</p>
+        <p class="mt-1 text-lg font-bold text-slate-900 break-all">${escaparHTML(requisicao.codigo || "-")}</p>
+      </div>
+      <div class="flex flex-col items-start sm:items-end gap-1">
+        <span class="text-xs font-semibold text-slate-500">Situação atual</span>
+        ${criarStatusHtml(requisicao.status)}
+      </div>
     </div>
 
-    <div>
-      <p class="text-sm font-semibold text-slate-500 mb-1">
-        Criado por
-      </p>
-      <p class="font-medium text-slate-800">
-        ${escaparHTML(nomeDoUsuario)}
-      </p>
+    <div class="rounded-xl border border-slate-200 p-4">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Solicitante</p>
+      <p class="mt-2 font-semibold text-slate-800 break-words">${escaparHTML(nomeDoUsuario)}</p>
+    </div>
+    <div class="rounded-xl border border-slate-200 p-4">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Datas</p>
+      <p class="mt-2 text-sm text-slate-700"><span class="text-slate-500">Criada:</span> ${escaparHTML(formatarData(requisicao.dataMovimentacao))}</p>
+      <p class="mt-1 text-sm text-slate-700"><span class="text-slate-500">Atualizada:</span> ${escaparHTML(formatarData(requisicao.dataAtualizada))}</p>
     </div>
 
-    <div>
-      <p class="text-sm font-semibold text-slate-500 mb-1">
-        Materiais solicitados
-      </p>
-      <p class="font-medium text-slate-800 whitespace-pre-line">
-        ${escaparHTML(nomeProduto)}
-      </p>
-    </div>
+    <section class="md:col-span-2 overflow-hidden rounded-xl border border-slate-200">
+      <div class="flex items-center justify-between gap-3 bg-slate-50 px-4 py-3 border-b border-slate-200">
+        <h4 class="font-bold text-slate-800">Materiais solicitados</h4>
+        <span class="text-xs font-semibold text-slate-500">${itens.length} ${itens.length === 1 ? "material" : "materiais"}</span>
+      </div>
+      <div class="divide-y divide-slate-100">${linhasMateriais}</div>
+    </section>
 
-    <div>
-      <p class="text-sm font-semibold text-slate-500 mb-1">
-        Status
-      </p>
-      ${criarStatusHtml(requisicao.status)}
-    </div>
-
-    <div>
-      <p class="text-sm font-semibold text-slate-500 mb-1">
-        Data de criação
-      </p>
-      <p class="font-medium text-slate-800">
-        ${escaparHTML(formatarData(requisicao.dataMovimentacao))}
-      </p>
-    </div>
-
-    <div>
-      <p class="text-sm font-semibold text-slate-500 mb-1">
-        Data atualizada
-      </p>
-      <p class="font-medium text-slate-800">
-        ${escaparHTML(formatarData(requisicao.dataAtualizada))}
-      </p>
-    </div>
-
-    <div class="md:col-span-2">
-      <p class="text-sm font-semibold text-slate-500 mb-1">
-        Observação
-      </p>
-      <p class="font-medium text-slate-800 whitespace-pre-wrap break-words">
-        ${escaparHTML(requisicao.observacao || "Sem observação")}
-      </p>
-    </div>
+    <section class="md:col-span-2 rounded-xl border border-slate-200 p-4">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Observação</p>
+      <p class="mt-2 text-sm text-slate-700 whitespace-pre-wrap break-words">${escaparHTML(requisicao.observacao || "Sem observação")}</p>
+    </section>
   `;
 
   // Somente administradores podem alterar status
