@@ -3,6 +3,8 @@ package com.almoxarifado.backend.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
+import jakarta.persistence.Transient;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -60,6 +62,12 @@ public class Movimentacao {
     // Valor unitário de aquisição
     @Column(name = "valor_unitario", precision = 14, scale = 4)
     private BigDecimal valorUnitario;
+
+    @Transient
+    private List<RequisicaoItem> itens;
+
+    public List<RequisicaoItem> getItens() { return itens; }
+    public void setItens(List<RequisicaoItem> itens) { this.itens = itens; }
 
     // Construtor vazio usado pelo JPA
     public Movimentacao() {
