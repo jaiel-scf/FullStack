@@ -211,8 +211,10 @@ public class MovimentacaoService {
 
         Date agora = new Date();
         requisicao.setId(null);
-        requisicao.setProdutoId(null);
-        requisicao.setQuantidade(null);
+        // Mantem o primeiro item nas colunas legadas para compatibilidade
+        // com integracoes existentes e possiveis restricoes NOT NULL.
+        requisicao.setProdutoId(itens.get(0).getProdutoId());
+        requisicao.setQuantidade(itens.get(0).getQuantidade());
         requisicao.setTipo("REQUISICAO");
         requisicao.setCodigo(gerarCodigoRequisicao());
         requisicao.setStatus("AGUARDANDO");
