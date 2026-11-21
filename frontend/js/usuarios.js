@@ -183,16 +183,14 @@ formMeuPerfil.addEventListener("submit", async function (event) {
   event.preventDefault();
 
   const nome = nomePerfil.value.trim();
-  const email = emailPerfil.value.trim();
-
-  if (!nome || !email) {
-    mensagemMeuPerfil.textContent = "Preencha todos os campos.";
+  if (!nome) {
+    mensagemMeuPerfil.textContent = "Informe seu nome.";
     mensagemMeuPerfil.className = "text-sm mt-4 text-red-600";
     return;
   }
 
   try {
-    const resposta = await fetch(`${API_URL}/usuarios/me`, {
+    const resposta = await fetch(`${API_URL}/usuarios/meu-perfil`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
