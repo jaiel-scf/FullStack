@@ -35,7 +35,7 @@ function criarModalPreferencias() {
       <div class="cabecalho-preferencias">
         <div>
           <h2 id="tituloPreferencias">Preferências</h2>
-          <p>Escolha o tema desejado e confirme para aplicar.</p>
+          <p>Experimente o tema na tela. Só será salvo após confirmar.</p>
         </div>
         <button type="button" class="fechar-preferencias" id="fecharPreferencias" aria-label="Cancelar e fechar">&times;</button>
       </div>
@@ -45,7 +45,7 @@ function criarModalPreferencias() {
           <button type="button" id="temaClaro" aria-pressed="false" class="flex-1 border border-slate-300 rounded-xl p-3 font-semibold transition">☀️ Claro</button>
           <button type="button" id="temaEscuro" aria-pressed="false" class="flex-1 border border-slate-300 rounded-xl p-3 font-semibold transition">🌙 Escuro</button>
         </div>
-        <p>A mudança será salva somente ao confirmar.</p>
+        <p>Pré-visualização temporária: Cancelar restaura o tema anterior.</p>
       </div>
       <div class="acoes-preferencias flex gap-3 justify-end">
         <button type="button" id="cancelarPreferencias" class="border border-slate-300 rounded-lg px-5 py-3 font-semibold">Cancelar</button>
@@ -56,7 +56,7 @@ function criarModalPreferencias() {
   for (const [id, tema] of [["temaClaro", "claro"], ["temaEscuro", "escuro"]]) {
     document.getElementById(id).addEventListener("click", () => {
       temaEmEdicao = tema;
-      atualizarBotoesTema(tema);
+      mostrarTema(tema); // Pré-visualização na página, sem salvar no localStorage.
     });
   }
   document.getElementById("salvarPreferencias").addEventListener("click", () => {
