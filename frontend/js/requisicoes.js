@@ -126,6 +126,69 @@ const campoQuantidade = document.getElementById("quantidade");
 const campoObservacao = document.getElementById("observacao");
 const mensagemRequisicao = document.getElementById("mensagemRequisicao");
 const botaoEnviarRequisicao = document.getElementById("botaoEnviarRequisicao");
+const botaoAdicionarItem = document.getElementById("botaoAdicionarItem");
+const listaItensRequisicao = document.getElementById("listaItensRequisicao");
+const contadorItens = document.getElementById("contadorItens");
+let itensNovaRequisicao = [];
+
+function itensDaRequisicao(requisicao) {
+  return Array.isArray(requisicao.itens) && requisicao.itens.length
+    ? requisicao.itens
+    : [{ produtoId: requisicao.produtoId, quantidade: requisicao.quantidade }];
+}
+
+function renderizarItensFormulario() {
+  listaItensRequisicao.replaceChildren();
+  contadorItens.textContent = String(itensNovaRequisicao.length);
+  itensNovaRequisicao.forEach((item) => {
+    const linha = document.createElement("div");
+    linha.className = "flex items-center justify-between gap-3 border border-slate-200 rounded-xl p-3";
+    const nome = document.createElement("span");
+    nome.className = "text-sm text-slate-700";
+    nome.textContent = `${buscarNomeProduto(item.produtoId)} — Quantidade: ${item.quantidade}`;
+    const editar = document.createElement("button");
+    editar.type = "button";
+    editar.textContent = "Editar";
+    editar.className = "text-blue-600 font-semibold";
+    editar.onclick = () => {
+      campoMaterial.value = String(item.produtoId);
+      campoQuantidade.value = String(item.quantidade);
+      itensNovaRequisicao = itensNovaRequisicao.filter((atual) => atual.produtoId !== item.produtoId);
+      renderizarItensFormulario();
+    };
+    const remover = document.createElement("button");
+    remover.type = "button";
+    remover.textContent = "Remover";
+    remover.className = "text-red-600 font-semibold";
+    remover.onclick = () => {
+      itensNovaRequisicao = itensNovaRequisicao.filter((atual) => atual.produtoId !== item.produtoId);
+      renderizarItensFormulario();
+    };
+    linha.append(nome, editar, remover);
+    listaItensRequisicao.appendChild(linha);
+  });
+}
+
+botaoAdicionarItem.addEventListener("click", () => {
+  const produtoId = Number(campoMaterial.value);
+  const quantidade = Number(campoQuantidade.value);
+  if (!produtoId || !Number.isSafeInteger(quantidade) || quantidade <= 0) {
+    mensagemRequisicao.textContent = "Selecione o material e informe uma quantidade inteira válida.";
+    mensagemRequisicao.className = "text-sm mb-4 text-red-600";
+    return;
+  }
+  if (itensNovaRequisicao.some((item) => item.produtoId === produtoId)) {
+    mensagemRequisicao.textContent = "Material já adicionado. Edite o item existente.";
+    mensagemRequisicao.className = "text-sm mb-4 text-red-600";
+    return;
+  }
+  itensNovaRequisicao.push({ produtoId, quantidade });
+  campoMaterial.value = "";
+  campoQuantidade.value = "";
+  mensagemRequisicao.textContent = "";
+  renderizarItensFormulario();
+});
+
 
 // Filtros
 const filtroCodigo = document.getElementById("filtroCodigo");
@@ -545,6 +608,8 @@ function fecharModalNovaRequisicao() {
   modalNovaRequisicao.classList.add("hidden");
 
   formRequisicao.reset();
+  itensNovaRequisicao = [];
+  renderizarItensFormulario();
   mensagemRequisicao.textContent = "";
 }
 
@@ -563,14 +628,9 @@ modalNovaRequisicao.addEventListener("click", function (event) {
 formRequisicao.addEventListener("submit", async function (event) {
   event.preventDefault();
 
-  const produtoId = campoMaterial.value;
-  const quantidade = Number(campoQuantidade.value);
   const observacao = campoObservacao.value.trim();
-
-  if (!produtoId || !Number.isSafeInteger(quantidade) || quantidade <= 0) {
-    mensagemRequisicao.textContent =
-      "Selecione o material e informe uma quantidade inteira válida.";
-
+  if (itensNovaRequisicao.length === 0) {
+    mensagemRequisicao.textContent = "Adicione pelo menos um material à requisição.";
     mensagemRequisicao.className = "text-sm mb-4 text-red-600";
     return;
   }
@@ -588,8 +648,7 @@ formRequisicao.addEventListener("submit", async function (event) {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        produtoId: Number(produtoId),
-        quantidade: quantidade,
+        itens: itensNovaRequisicao,
         observacao: observacao,
       }),
     });
@@ -630,7 +689,8 @@ function abrirDetalhesRequisicao(requisicao) {
   mensagemStatus.textContent = "";
   mensagemStatus.className = "text-sm mt-4";
 
-  const nomeProduto = buscarNomeProduto(requisicao.produtoId);
+  const itens = itensDaRequisicao(requisicao);
+  const nomeProduto = itens.map((item) => `${buscarNomeProduto(item.produtoId)} — Qtd.: ${item.quantidade}`).join("\n");
   const nomeDoUsuario = buscarNomeUsuario(requisicao.usuarioId);
 
   conteudoDetalhes.innerHTML = `
@@ -654,19 +714,10 @@ function abrirDetalhesRequisicao(requisicao) {
 
     <div>
       <p class="text-sm font-semibold text-slate-500 mb-1">
-        Produto
+        Materiais solicitados
       </p>
-      <p class="font-medium text-slate-800">
+      <p class="font-medium text-slate-800 whitespace-pre-line">
         ${escaparHTML(nomeProduto)}
-      </p>
-    </div>
-
-    <div>
-      <p class="text-sm font-semibold text-slate-500 mb-1">
-        Quantidade
-      </p>
-      <p class="font-medium text-slate-800">
-        ${escaparHTML(requisicao.quantidade ?? 0)}
       </p>
     </div>
 
