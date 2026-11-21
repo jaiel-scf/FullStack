@@ -35,7 +35,7 @@ function criarModalPreferencias() {
       <div class="cabecalho-preferencias">
         <div>
           <h2 id="tituloPreferencias">Preferências</h2>
-          <p>Escolha um tema, visualize e confirme se deseja mantê-lo.</p>
+          <p>Escolha o tema desejado e confirme para aplicar.</p>
         </div>
         <button type="button" class="fechar-preferencias" id="fecharPreferencias" aria-label="Cancelar e fechar">&times;</button>
       </div>
@@ -56,11 +56,13 @@ function criarModalPreferencias() {
   for (const [id, tema] of [["temaClaro", "claro"], ["temaEscuro", "escuro"]]) {
     document.getElementById(id).addEventListener("click", () => {
       temaEmEdicao = tema;
-      mostrarTema(tema);
+      atualizarBotoesTema(tema);
     });
   }
   document.getElementById("salvarPreferencias").addEventListener("click", () => {
-    localStorage.setItem(CHAVE_TEMA, temaEmEdicao || temaSalvo());
+    const temaConfirmado = temaEmEdicao || temaSalvo();
+    localStorage.setItem(CHAVE_TEMA, temaConfirmado);
+    mostrarTema(temaConfirmado);
     encerrarPreferencias(false);
   });
   document.getElementById("cancelarPreferencias").addEventListener("click", () => encerrarPreferencias(true));
