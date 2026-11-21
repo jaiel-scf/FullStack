@@ -344,7 +344,8 @@ async function carregarRequisicoes(voltarPrimeiraPagina = false) {
     }
 
     if (!resposta.ok) {
-      throw new Error("Não foi possível carregar as requisições.");
+      const detalhe = await resposta.text().catch(() => "");
+      throw new Error(`Não foi possível carregar as requisições (HTTP ${resposta.status})${detalhe ? ": " + detalhe.slice(0, 180) : ""}.`);
     }
 
     const dados = await resposta.json();
@@ -377,7 +378,7 @@ async function carregarRequisicoes(voltarPrimeiraPagina = false) {
     tabelaRequisicoes.innerHTML = "";
     areaPaginacaoRequisicoes.classList.add("hidden");
 
-    mensagemLista.textContent = "Não foi possível carregar as requisições.";
+    mensagemLista.textContent = erro.message || "Não foi possível carregar as requisições.";
     mensagemLista.className = "p-5 text-red-600";
   }
 }
@@ -658,8 +659,9 @@ formRequisicao.addEventListener("submit", async function (event) {
     }
 
     if (!resposta.ok) {
+      const detalhe = await resposta.text().catch(() => "");
       mensagemRequisicao.textContent =
-        "Não foi possível realizar a requisição.";
+        `Não foi possível realizar a requisição (HTTP ${resposta.status})${detalhe ? ": " + detalhe.slice(0, 180) : ""}.`;
 
       mensagemRequisicao.className = "text-sm mb-4 text-red-600";
       return;
