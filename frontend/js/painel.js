@@ -56,7 +56,7 @@ $("botaoMeuPerfil").addEventListener("click", async () => {
   } catch (erro) { $("mensagemMeuPerfil").textContent = erro.message; }
 });
 $("botaoAlterarSenha").addEventListener("click", () => { fecharMenu(); $("formAlterarSenha").reset(); $("mensagemAlterarSenha").textContent = ""; $("modalAlterarSenha").classList.remove("hidden"); });
-$("botaoPreferencias").addEventListener("click", () => { fecharMenu(); if (window.alternarTema) window.alternarTema(); else document.documentElement.classList.toggle("dark"); });
+$("botaoPreferencias").addEventListener("click", fecharMenu);
 for (const id of ["botaoFecharPerfil", "botaoCancelarPerfil", "botaoFecharSenha", "botaoCancelarSenha"]) $(id).addEventListener("click", fecharModais);
 for (const id of ["modalMeuPerfil", "modalAlterarSenha"]) $(id).addEventListener("click", (evento) => { if (evento.target === $(id)) fecharModais(); });
 document.querySelectorAll("[data-toggle-senha]").forEach((botao) => botao.addEventListener("click", () => {
