@@ -130,6 +130,62 @@ const botaoAdicionarItem = document.getElementById("botaoAdicionarItem");
 const listaItensRequisicao = document.getElementById("listaItensRequisicao");
 const contadorItens = document.getElementById("contadorItens");
 let itensNovaRequisicao = [];
+const fotosProdutos = new Map();
+const fotoMaterialSelecionado = document.createElement("div");
+fotoMaterialSelecionado.className = "hidden mt-3 flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3";
+campoMaterial.insertAdjacentElement("afterend", fotoMaterialSelecionado);
+
+async function buscarFotoProduto(produtoId) {
+  if (fotosProdutos.has(produtoId)) return fotosProdutos.get(produtoId);
+  const requisicaoFoto = (async () => {
+    try {
+      const resposta = await fetch(`${API_URL}/produtos/${produtoId}/imagem`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!resposta.ok) return null;
+      const imagem = await resposta.blob();
+      return imagem.type.startsWith("image/") ? URL.createObjectURL(imagem) : null;
+    } catch (erro) {
+      console.warn("Não foi possível carregar a foto do material:", produtoId, erro);
+      return null;
+    }
+  })();
+  fotosProdutos.set(produtoId, requisicaoFoto);
+  return requisicaoFoto;
+}
+
+function criarMiniaturaProduto(produtoId, classe = "h-14 w-14") {
+  const caixa = document.createElement("div");
+  caixa.className = `${classe} shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 flex items-center justify-center text-center text-[10px] text-slate-500`;
+  caixa.textContent = "Sem foto";
+  buscarFotoProduto(produtoId).then((url) => {
+    if (!url || !caixa.isConnected) return;
+    const imagem = document.createElement("img");
+    imagem.src = url;
+    imagem.alt = "Foto do material";
+    imagem.className = "w-full h-full object-cover";
+    caixa.replaceChildren(imagem);
+  });
+  return caixa;
+}
+
+function atualizarFotoMaterialSelecionado() {
+  const produtoId = Number(campoMaterial.value);
+  fotoMaterialSelecionado.replaceChildren();
+  fotoMaterialSelecionado.classList.toggle("hidden", !produtoId);
+  if (!produtoId) return;
+  const nome = document.createElement("span");
+  nome.className = "min-w-0 text-sm font-medium text-slate-700 break-words";
+  nome.textContent = buscarNomeProduto(produtoId);
+  fotoMaterialSelecionado.append(criarMiniaturaProduto(produtoId, "h-16 w-16"), nome);
+}
+campoMaterial.addEventListener("change", atualizarFotoMaterialSelecionado);
+window.addEventListener("beforeunload", async () => {
+  for (const promessa of fotosProdutos.values()) {
+    const url = await promessa;
+    if (url) URL.revokeObjectURL(url);
+  }
+});
 
 function itensDaRequisicao(requisicao) {
   return Array.isArray(requisicao.itens) && requisicao.itens.length
@@ -146,6 +202,7 @@ function atualizarMateriaisDisponiveis() {
     opcao.disabled = incluido;
   }
   if (selecionados.has(campoMaterial.value)) campoMaterial.value = "";
+  atualizarFotoMaterialSelecionado();
 }
 
 function renderizarItensFormulario() {
@@ -156,7 +213,7 @@ function renderizarItensFormulario() {
     const linha = document.createElement("div");
     linha.className = "flex items-center justify-between gap-3 border border-slate-200 rounded-xl p-3";
     const nome = document.createElement("span");
-    nome.className = "text-sm text-slate-700";
+    nome.className = "text-sm text-slate-700 flex-1 min-w-0";
     nome.textContent = `${buscarNomeProduto(item.produtoId)} — Quantidade: ${item.quantidade}`;
     const editar = document.createElement("button");
     editar.type = "button";
@@ -167,6 +224,7 @@ function renderizarItensFormulario() {
       renderizarItensFormulario();
       campoMaterial.value = String(item.produtoId);
       campoQuantidade.value = String(item.quantidade);
+      atualizarFotoMaterialSelecionado();
     };
     const remover = document.createElement("button");
     remover.type = "button";
@@ -176,7 +234,7 @@ function renderizarItensFormulario() {
       itensNovaRequisicao = itensNovaRequisicao.filter((atual) => atual.produtoId !== item.produtoId);
       renderizarItensFormulario();
     };
-    linha.append(nome, editar, remover);
+    linha.append(criarMiniaturaProduto(item.produtoId), nome, editar, remover);
     listaItensRequisicao.appendChild(linha);
   });
 }
