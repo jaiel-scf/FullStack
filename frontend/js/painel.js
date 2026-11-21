@@ -66,7 +66,7 @@ document.querySelectorAll("[data-toggle-senha]").forEach((botao) => botao.addEve
 $("formMeuPerfil").addEventListener("submit", async (evento) => {
   evento.preventDefault();
   try {
-    const resposta = await fetch(`${API_URL}/usuarios/me`, { method: "PUT", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify({ nome: $("nomePerfil").value.trim(), email: $("emailPerfil").value.trim() }) });
+    const resposta = await fetch(`${API_URL}/usuarios/meu-perfil`, { method: "PUT", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify({ nome: $("nomePerfil").value.trim() }) });
     if (!resposta.ok) throw new Error("Não foi possível atualizar seu perfil.");
     sessionStorage.setItem("usuarioNome", $("nomePerfil").value.trim());
     $("nomeUsuario").textContent = $("nomePerfil").value.trim();
