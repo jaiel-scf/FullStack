@@ -480,10 +480,8 @@ formMeuPerfil.addEventListener("submit", async function (event) {
   }
 
   const nome = nomePerfil.value.trim();
-  const email = emailPerfil.value.trim();
-
-  if (!nome || !email) {
-    mostrarMensagemPerfil("Preencha todos os campos.");
+  if (!nome) {
+    mostrarMensagemPerfil("Informe seu nome.");
     return;
   }
 
@@ -492,7 +490,7 @@ formMeuPerfil.addEventListener("submit", async function (event) {
   mostrarMensagemPerfil("Salvando alterações...", "carregando");
 
   try {
-    const resposta = await fetch(`${API_URL}/usuarios/me`, {
+    const resposta = await fetch(`${API_URL}/usuarios/meu-perfil`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -500,7 +498,6 @@ formMeuPerfil.addEventListener("submit", async function (event) {
       },
       body: JSON.stringify({
         nome: nome,
-        email: email,
       }),
     });
 
