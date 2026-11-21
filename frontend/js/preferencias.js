@@ -1,5 +1,17 @@
 const CHAVE_TEMA = "temaPreferido";
 
+function atualizarBotoesTema(tema) {
+  for (const [id, valor] of [["temaClaro", "claro"], ["temaEscuro", "escuro"]]) {
+    const botao = document.getElementById(id);
+    if (!botao) continue;
+    const ativo = tema === valor;
+    botao.setAttribute("aria-pressed", String(ativo));
+    botao.style.borderColor = ativo ? "#2563eb" : "";
+    botao.style.backgroundColor = ativo ? "rgba(37,99,235,0.12)" : "";
+    botao.style.color = ativo ? "#2563eb" : "";
+  }
+}
+
 // Aplica e salva o tema escolhido
 function aplicarTema(tema) {
   const temaValido = tema === "escuro" ? "escuro" : "claro";
@@ -11,11 +23,7 @@ function aplicarTema(tema) {
 
   localStorage.setItem(CHAVE_TEMA, temaValido);
 
-  const seletor = document.getElementById("seletorTema");
-
-  if (seletor) {
-    seletor.value = temaValido;
-  }
+  atualizarBotoesTema(temaValido);
 }
 
 // Aplica o tema salvo antes da página ser exibida
@@ -53,12 +61,10 @@ function criarModalPreferencias() {
       <div class="campo-preferencias">
         <label for="seletorTema">Tema do sistema</label>
 
-        <select
-          id="seletorTema"
-          class="border border-slate-300 rounded-lg p-3">
-          <option value="claro">Claro</option>
-          <option value="escuro">Escuro</option>
-        </select>
+        <div class="flex gap-3" role="group" aria-label="Tema do sistema">
+          <button type="button" id="temaClaro" aria-pressed="false" class="flex-1 border border-slate-300 rounded-xl p-3 font-semibold transition">☀️ Claro</button>
+          <button type="button" id="temaEscuro" aria-pressed="false" class="flex-1 border border-slate-300 rounded-xl p-3 font-semibold transition">🌙 Escuro</button>
+        </div>
 
         <p>A preferência será mantida nas próximas visitas.</p>
       </div>
@@ -77,21 +83,17 @@ function criarModalPreferencias() {
 
   document.body.appendChild(modal);
 
-  document.getElementById("seletorTema").value =
-    localStorage.getItem(CHAVE_TEMA) || "claro";
+  atualizarBotoesTema(localStorage.getItem(CHAVE_TEMA) || "claro");
 
-  document
-    .getElementById("fecharPreferencias")
-    .addEventListener("click", fecharPreferencias);
-
-  document
-    .getElementById("salvarPreferencias")
-    .addEventListener("click", function () {
-      const tema = document.getElementById("seletorTema").value;
-
-      aplicarTema(tema);
-      fecharPreferencias();
-    });
+  document.getElementById("temaClaro").addEventListener("click", () => {
+    aplicarTema("claro");
+    fecharPreferencias();
+  });
+  document.getElementById("temaEscuro").addEventListener("click", () => {
+    aplicarTema("escuro");
+    fecharPreferencias();
+  });
+  document.getElementById("fecharPreferencias").addEventListener("click", fecharPreferencias);
 
   modal.addEventListener("click", function (event) {
     if (event.target === modal) {
