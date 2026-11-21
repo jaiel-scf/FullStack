@@ -123,7 +123,7 @@ formLogin.addEventListener("submit", async function (event) {
     mostrarMensagem("Login realizado com sucesso!", "green");
 
     setTimeout(function () {
-      window.location.href = "painel.html";
+      window.location.href = "estoque.html";
     }, 900);
   } catch (erro) {
     mostrarMensagem("Não foi possível conectar ao servidor.", "red");
