@@ -309,7 +309,6 @@ formMeuPerfil.addEventListener("submit", async function (event) {
       },
       body: JSON.stringify({
         nome,
-        email,
       }),
     });
 
