@@ -5,14 +5,21 @@ import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.almoxarifado.backend.model.Movimentacao;
+import com.almoxarifado.backend.model.RequisicaoItem;
 import com.almoxarifado.backend.model.Produto;
 import com.almoxarifado.backend.repository.MovimentacaoRepository;
+import com.almoxarifado.backend.repository.RequisicaoItemRepository;
 import com.almoxarifado.backend.repository.ProdutoRepository;
 
 @Service
@@ -20,17 +27,33 @@ public class MovimentacaoService {
 
     private final MovimentacaoRepository movimentacaoRepository;
     private final ProdutoRepository produtoRepository;
+    private final RequisicaoItemRepository requisicaoItemRepository;
 
     public MovimentacaoService(
             MovimentacaoRepository movimentacaoRepository,
-            ProdutoRepository produtoRepository) {
+            ProdutoRepository produtoRepository,
+            RequisicaoItemRepository requisicaoItemRepository) {
 
         this.movimentacaoRepository = movimentacaoRepository;
         this.produtoRepository = produtoRepository;
+        this.requisicaoItemRepository = requisicaoItemRepository;
     }
 
     public List<Movimentacao> listarTodos() {
-        return movimentacaoRepository.findAll();
+        List<Movimentacao> movimentacoes = movimentacaoRepository.findAll();
+        List<Long> ids = movimentacoes.stream()
+                .filter(m -> "REQUISICAO".equalsIgnoreCase(m.getTipo()))
+                .map(Movimentacao::getId).toList();
+        Map<Long, List<RequisicaoItem>> porRequisicao = ids.isEmpty()
+                ? Map.of()
+                : requisicaoItemRepository.findByRequisicaoIdIn(ids).stream()
+                    .collect(Collectors.groupingBy(RequisicaoItem::getRequisicaoId));
+        for (Movimentacao m : movimentacoes) {
+            if ("REQUISICAO".equalsIgnoreCase(m.getTipo())) {
+                m.setItens(itensDaRequisicao(m, porRequisicao.getOrDefault(m.getId(), List.of())));
+            }
+        }
+        return movimentacoes;
     }
 
     // Registra entrada ou saída
@@ -152,35 +175,63 @@ public class MovimentacaoService {
         return movimentacaoRepository.save(movimentacao);
     }
 
-    // Cria requisição sem alterar o estoque
+    // Requisicoes antigas usam produtoId/quantidade; novas usam itens persistidos.
+    private List<RequisicaoItem> itensDaRequisicao(Movimentacao requisicao, List<RequisicaoItem> persistidos) {
+        if (!persistidos.isEmpty()) return persistidos;
+        if (requisicao.getProdutoId() == null || requisicao.getQuantidade() == null) return List.of();
+        RequisicaoItem legado = new RequisicaoItem();
+        legado.setRequisicaoId(requisicao.getId());
+        legado.setProdutoId(requisicao.getProdutoId());
+        legado.setQuantidade(requisicao.getQuantidade());
+        return List.of(legado);
+    }
+
     @Transactional
-    public Movimentacao criarRequisicao(Movimentacao movimentacao) {
-
-        if (movimentacao.getProdutoId() == null) {
-            throw new RuntimeException("Produto não informado");
+    public Movimentacao criarRequisicao(Movimentacao requisicao) {
+        List<RequisicaoItem> itens = requisicao.getItens();
+        if (itens == null || itens.isEmpty()) {
+            if (requisicao.getProdutoId() == null || requisicao.getQuantidade() == null) {
+                throw new RuntimeException("Informe pelo menos um material");
+            }
+            RequisicaoItem unico = new RequisicaoItem();
+            unico.setProdutoId(requisicao.getProdutoId());
+            unico.setQuantidade(requisicao.getQuantidade());
+            itens = List.of(unico);
         }
-
-        produtoRepository
-                .findById(movimentacao.getProdutoId())
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
-
-        if (movimentacao.getQuantidade() == null
-                || movimentacao.getQuantidade() <= 0) {
-
-            throw new RuntimeException(
-                    "A quantidade deve ser maior que zero");
+        Set<Long> ids = new HashSet<>();
+        for (RequisicaoItem item : itens) {
+            if (item == null || item.getProdutoId() == null || item.getQuantidade() == null
+                    || item.getQuantidade() <= 0 || !ids.add(item.getProdutoId())) {
+                throw new RuntimeException("Itens invalidos ou materiais repetidos");
+            }
+            if (!produtoRepository.existsById(item.getProdutoId())) {
+                throw new RuntimeException("Produto nao encontrado: " + item.getProdutoId());
+            }
         }
 
         Date agora = new Date();
-
-        movimentacao.setTipo("REQUISICAO");
-        movimentacao.setCodigo(gerarCodigoRequisicao());
-        movimentacao.setStatus("AGUARDANDO");
-        movimentacao.setDataMovimentacao(agora);
-        movimentacao.setDataAtualizada(agora);
-        movimentacao.setValorUnitario(null);
-
-        return movimentacaoRepository.save(movimentacao);
+        requisicao.setId(null);
+        // Mantem o primeiro item nas colunas legadas para compatibilidade
+        // com integracoes existentes e possiveis restricoes NOT NULL.
+        requisicao.setProdutoId(itens.get(0).getProdutoId());
+        requisicao.setQuantidade(itens.get(0).getQuantidade());
+        requisicao.setTipo("REQUISICAO");
+        requisicao.setCodigo(gerarCodigoRequisicao());
+        requisicao.setStatus("AGUARDANDO");
+        requisicao.setDataMovimentacao(agora);
+        requisicao.setDataAtualizada(agora);
+        requisicao.setValorUnitario(null);
+        Movimentacao salva = movimentacaoRepository.save(requisicao);
+        List<RequisicaoItem> gravados = new ArrayList<>();
+        for (RequisicaoItem item : itens) {
+            RequisicaoItem novo = new RequisicaoItem();
+            novo.setRequisicaoId(salva.getId());
+            novo.setProdutoId(item.getProdutoId());
+            novo.setQuantidade(item.getQuantidade());
+            gravados.add(novo);
+        }
+        salva.setItens(requisicaoItemRepository.saveAll(gravados));
+        return salva;
     }
 
     // Altera o status da requisição
@@ -234,23 +285,27 @@ public class MovimentacaoService {
         return movimentacaoRepository.save(requisicao);
     }
 
-    // Retira o produto do estoque ao autorizar
+    // Validacao e baixa atomicas; bloqueio por ID para evitar deadlocks.
     private void autorizarRequisicao(Movimentacao requisicao) {
-
-        Produto produto = produtoRepository
-                .buscarPorIdComBloqueio(requisicao.getProdutoId())
-                .orElseThrow(() -> new RuntimeException(
-                        "Produto não encontrado"));
-
-        if (produto.getQuantidade() < requisicao.getQuantidade()) {
-            throw new RuntimeException("Estoque insuficiente");
+        List<RequisicaoItem> itens = itensDaRequisicao(requisicao,
+                requisicaoItemRepository.findByRequisicaoId(requisicao.getId()));
+        if (itens.isEmpty()) throw new RuntimeException("Requisicao sem materiais");
+        List<RequisicaoItem> ordenados = new ArrayList<>(itens);
+        ordenados.sort((a, b) -> a.getProdutoId().compareTo(b.getProdutoId()));
+        List<Produto> bloqueados = new ArrayList<>();
+        for (RequisicaoItem item : ordenados) {
+            Produto produto = produtoRepository.buscarPorIdComBloqueio(item.getProdutoId())
+                    .orElseThrow(() -> new RuntimeException("Produto nao encontrado: " + item.getProdutoId()));
+            if (produto.getQuantidade() == null || produto.getQuantidade() < item.getQuantidade()) {
+                throw new RuntimeException("Estoque insuficiente para " + produto.getNome());
+            }
+            bloqueados.add(produto);
         }
-
-        produto.setQuantidade(
-                produto.getQuantidade() - requisicao.getQuantidade());
-
-        // O custo médio permanece inalterado
-        produtoRepository.save(produto);
+        for (int i = 0; i < ordenados.size(); i++) {
+            Produto produto = bloqueados.get(i);
+            produto.setQuantidade(produto.getQuantidade() - ordenados.get(i).getQuantidade());
+        }
+        produtoRepository.saveAll(bloqueados);
     }
 
     // Gera código automático da requisição
