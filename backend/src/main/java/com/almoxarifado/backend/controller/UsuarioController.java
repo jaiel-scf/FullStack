@@ -206,6 +206,20 @@ public class UsuarioController {
         usuarioService.excluirUsuario(id);
     }
 
+    // Executado pelo administrador após confirmar a titularidade do pedido.
+    @DeleteMapping("/{id}/dados-pessoais")
+    public void excluirDadosPessoais(
+            @PathVariable Long id,
+            @AuthenticationPrincipal Jwt jwt) {
+        validarAdmin(jwt);
+        Number usuarioLogadoId = jwt.getClaim("id");
+        if (usuarioLogadoId != null && usuarioLogadoId.longValue() == id.longValue()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Você não pode excluir os dados da conta em uso");
+        }
+        usuarioService.excluirDadosPessoais(id);
+    }
+
     // Confere perfil de administrador
     private void validarAdmin(Jwt jwt) {
 
