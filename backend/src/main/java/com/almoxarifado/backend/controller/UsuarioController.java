@@ -107,6 +107,27 @@ public class UsuarioController {
         usuarioService.excluirUsuario(id);
     }
 
+    // Processa exclusão de dados pessoais após verificação da solicitação.
+    // Restrito ao administrador e impede excluir os próprios dados em sessão.
+    @DeleteMapping("/{id}/dados-pessoais")
+    public void excluirDadosPessoais(
+            @PathVariable Long id,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        validarAdmin(jwt);
+
+        Number usuarioLogadoId = jwt.getClaim("id");
+
+        if (usuarioLogadoId != null
+                && usuarioLogadoId.longValue() == id.longValue()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Você não pode excluir os dados da conta em uso");
+        }
+
+        usuarioService.excluirDadosPessoais(id);
+    }
+
     // Confere perfil de administrador
     private void validarAdmin(Jwt jwt) {
 
