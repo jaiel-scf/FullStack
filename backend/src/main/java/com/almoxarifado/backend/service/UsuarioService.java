@@ -429,6 +429,23 @@ public class UsuarioService {
                 return usuarioRepository.save(usuario);
         }
 
+        // Anonimiza dados pessoais após solicitação de exclusão verificada.
+        // Mantém o ID para preservar a integridade do histórico operacional.
+        public void excluirDadosPessoais(Long id) {
+                Usuario usuario = usuarioRepository.findById(id)
+                                .orElseThrow(() -> new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+
+                usuario.setAtivo(false);
+                usuario.setNome("Usuário excluído");
+                usuario.setEmail("excluido-" + id + "@conta-inativa.invalid");
+                usuario.setSenhaHash(passwordEncoder.encode(UUID.randomUUID().toString()));
+                usuario.setPrimeiroAcesso(false);
+                usuario.setTokenRedefinicao(null);
+                usuario.setTokenExpiraEm(null);
+                usuarioRepository.save(usuario);
+        }
+
         // Inativa o usuário sem apagar seu histórico
         public void excluirUsuario(Long id) {
 
