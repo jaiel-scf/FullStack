@@ -2,6 +2,12 @@ package com.almoxarifado.backend.config;
 
 import java.util.Base64;
 import java.util.List;
+import com.almoxarifado.backend.repository.UsuarioRepository;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -28,6 +34,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 // Configura a segurança da aplicação
 @Configuration
 public class SecurityConfig {
+
+        private final UsuarioRepository usuarioRepository;
+
+        public SecurityConfig(UsuarioRepository usuarioRepository) {
+                this.usuarioRepository = usuarioRepository;
+        }
 
         @Value("${jwt.secret}")
         private String jwtSecret;
@@ -62,9 +74,37 @@ public class SecurityConfig {
         @Bean
         public JwtDecoder jwtDecoder() {
 
-                return NimbusJwtDecoder
+                NimbusJwtDecoder decoder = NimbusJwtDecoder
                                 .withSecretKey(secretKey())
                                 .build();
+
+                OAuth2TokenValidator<Jwt> validadorContaAtiva = token -> {
+                        Number usuarioId = token.getClaim("id");
+                        if (usuarioId == null) {
+                                return OAuth2TokenValidatorResult.failure(
+                                                new OAuth2Error("invalid_token", "Token sem identificador de usuário", null));
+                        }
+
+                        boolean ativo = usuarioRepository.findById(usuarioId.longValue())
+                                        .map(usuario -> Boolean.TRUE.equals(usuario.getAtivo())
+                                                        && usuario.getEmail().equals(token.getSubject()))
+                                        .orElse(false);
+
+                        return ativo
+                                        ? OAuth2TokenValidatorResult.success()
+                                        : OAuth2TokenValidatorResult.failure(
+                                                        new OAuth2Error("invalid_token", "Conta inativa ou removida", null));
+                };
+
+                decoder.setJwtValidator(token -> {
+                        OAuth2TokenValidatorResult padrao = JwtValidators.createDefault().validate(token);
+                        if (padrao.hasErrors()) {
+                                return padrao;
+                        }
+                        return validadorContaAtiva.validate(token);
+                });
+
+                return decoder;
         }
 
         // Define as regras de acesso
