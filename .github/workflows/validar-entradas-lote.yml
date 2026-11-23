@@ -1,0 +1,26 @@
+name: Validar entradas em lote
+on:
+  push:
+    branches:
+      - feature/backend-entradas-lote-render
+      - feature/entradas-lote-integrada-main
+  workflow_dispatch:
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+      # Testes unitários isolados não exigem credenciais do banco de produção.
+      # O teste de inicialização do contexto requer um banco de testes dedicado.
+      - name: Compilar e executar testes unitários do backend
+        run: bash ./mvnw -B -f pom.xml -Dtest=MovimentacaoServiceTest,UsuarioServiceTest test
+        working-directory: backend
+      - name: Verificar sintaxe JavaScript
+        run: node --check frontend/js/entrada.js
