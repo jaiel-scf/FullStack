@@ -967,94 +967,147 @@ formNovoProduto.addEventListener("submit", async function (event) {
   }
 });
 
-// REGISTRO DE ENTRADA
+// REGISTRO DE ENTRADAS EM LOTE
+const itensEntrada = [];
+const botaoAdicionarItemEntrada = document.getElementById("botaoAdicionarItemEntrada");
+const listaItensEntrada = document.getElementById("listaItensEntrada");
+const listaEntradaVazia = document.getElementById("listaEntradaVazia");
+const contadorItensEntrada = document.getElementById("contadorItensEntrada");
+const resumoItensEntrada = document.getElementById("resumoItensEntrada");
+const totalItensEntrada = document.getElementById("totalItensEntrada");
+const botaoRegistrarEntradas = formEntrada.querySelector('button[type="submit"]');
 
-formEntrada.addEventListener("submit", async function (event) {
-  event.preventDefault();
+function renderizarItensEntrada() {
+  listaItensEntrada.replaceChildren();
+  listaEntradaVazia.classList.toggle("hidden", itensEntrada.length > 0);
+  resumoItensEntrada.classList.toggle("hidden", itensEntrada.length === 0);
+  contadorItensEntrada.textContent = `${itensEntrada.length} ${itensEntrada.length === 1 ? "produto" : "produtos"}`;
+  botaoRegistrarEntradas.disabled = itensEntrada.length === 0;
 
-  const produtoId = produtoEntrada.value;
-  const quantidade = quantidadeEntrada.value;
+  let total = 0;
+  itensEntrada.forEach((item, indice) => {
+    total += item.quantidade * item.valorUnitario;
+    const linha = document.createElement("div");
+    linha.className = "flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 p-3 bg-slate-50";
+    const descricao = document.createElement("div");
+    descricao.className = "min-w-0 flex-1";
+    const nome = document.createElement("p");
+    nome.className = "font-semibold text-slate-800";
+    nome.textContent = item.nome;
+    const detalhes = document.createElement("p");
+    detalhes.className = "text-sm text-slate-500 mt-1";
+    detalhes.textContent = `${item.quantidade} × ${formatarMoedaEntrada(item.valorUnitario)} = ${formatarMoedaEntrada(item.quantidade * item.valorUnitario)}`;
+    descricao.append(nome, detalhes);
+    if (item.observacao) {
+      const observacao = document.createElement("p");
+      observacao.className = "text-xs text-slate-500 mt-1";
+      observacao.textContent = item.observacao;
+      descricao.appendChild(observacao);
+    }
+    const remover = document.createElement("button");
+    remover.type = "button";
+    remover.className = "text-sm font-semibold text-red-600 hover:underline";
+    remover.textContent = "Remover";
+    remover.setAttribute("aria-label", `Remover ${item.nome}`);
+    remover.addEventListener("click", () => {
+      itensEntrada.splice(indice, 1);
+      renderizarItensEntrada();
+    });
+    linha.append(descricao, remover);
+    listaItensEntrada.appendChild(linha);
+  });
+  totalItensEntrada.textContent = formatarMoedaEntrada(total);
+}
+
+botaoAdicionarItemEntrada.addEventListener("click", () => {
+  const produtoId = Number(produtoEntrada.value);
+  const quantidade = Number(quantidadeEntrada.value);
   const valorUnitario = Number(valorUnitarioEntrada.value);
-  const observacao = observacaoEntrada.value.trim();
+  const produto = produtosCarregados.find((p) => Number(p.id) === produtoId);
 
-  if (!produtoId || !quantidade || valorUnitarioEntrada.value === "") {
-    mostrarMensagemEntrada(
-      "Selecione o produto e informe a quantidade e o custo unitário.",
-    );
+  if (!produto || !quantidadeEntrada.value || !valorUnitarioEntrada.value) {
+    mostrarMensagemEntrada("Selecione o produto e informe a quantidade e o custo unitário.");
     return;
   }
-
-  if (!Number.isSafeInteger(Number(quantidade)) || Number(quantidade) <= 0) {
-    mostrarMensagemEntrada(
-      "A quantidade deve ser um número inteiro maior que zero.",
-    );
+  if (!Number.isSafeInteger(quantidade) || quantidade <= 0) {
+    mostrarMensagemEntrada("A quantidade deve ser um número inteiro maior que zero.");
     return;
   }
-
-  if (!Number.isFinite(valorUnitario) || valorUnitario <= 0) {
-    mostrarMensagemEntrada("Informe um custo unitário maior que zero.");
+  if (!Number.isFinite(valorUnitario) || valorUnitario <= 0 || valorUnitario > 9999999999) {
+    mostrarMensagemEntrada("Informe um custo unitário válido e maior que zero.");
     return;
   }
+  if (itensEntrada.some((item) => item.produtoId === produtoId)) {
+    mostrarMensagemEntrada("Este produto já está na lista. Remova-o para alterar os dados.");
+    return;
+  }
+  itensEntrada.push({
+    produtoId,
+    nome: produto.nome,
+    quantidade,
+    valorUnitario,
+    observacao: observacaoEntrada.value.trim(),
+  });
+  produtoEntrada.value = "";
+  quantidadeEntrada.value = "";
+  valorUnitarioEntrada.value = "";
+  observacaoEntrada.value = "";
+  mostrarMensagemEntrada("Produto adicionado à lista.", "sucesso");
+  renderizarItensEntrada();
+});
 
-  const botaoRegistrar = formEntrada.querySelector('button[type="submit"]');
-
-  botaoRegistrar.disabled = true;
-  botaoRegistrar.classList.add("opacity-60", "cursor-not-allowed");
-
-  mostrarMensagemEntrada("Registrando entrada...", "carregando");
+formEntrada.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (botaoRegistrarEntradas.disabled || itensEntrada.length === 0) {
+    mostrarMensagemEntrada("Adicione pelo menos um produto à lista.");
+    return;
+  }
+  botaoRegistrarEntradas.disabled = true;
+  botaoAdicionarItemEntrada.disabled = true;
+  mostrarMensagemEntrada("Registrando entradas...", "carregando");
 
   try {
-    const resposta = await fetch(`${API_URL}/movimentacoes/registrar`, {
+    const resposta = await fetch(`${API_URL}/movimentacoes/entradas/lote`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({
-        produtoId: Number(produtoId),
-        usuarioId: Number(usuarioId),
-        tipo: "ENTRADA",
-        quantidade: Number(quantidade),
-        valorUnitario: valorUnitario,
-        observacao: observacao,
-      }),
+      body: JSON.stringify(itensEntrada.map(({ produtoId, quantidade, valorUnitario, observacao }) => ({
+        produtoId, quantidade, valorUnitario, observacao,
+      }))),
     });
-
     if (resposta.status === 401) {
       sessionStorage.clear();
       window.location.href = "login.html";
       return;
     }
-
     if (resposta.status === 403) {
-      mostrarMensagemEntrada(
-        "Apenas administradores podem registrar entradas.",
-      );
+      mostrarMensagemEntrada("Apenas administradores podem registrar entradas.");
       return;
     }
-
     if (!resposta.ok) {
-      mostrarMensagemEntrada("Não foi possível registrar a entrada.");
+      const erro = await resposta.json().catch(() => null);
+      mostrarMensagemEntrada(erro?.detail || erro?.message || "Não foi possível registrar as entradas.");
       return;
     }
-
+    const quantidadeRegistrada = itensEntrada.length;
+    itensEntrada.length = 0;
     formEntrada.reset();
-
+    renderizarItensEntrada();
     await carregarProdutos();
-
-    mostrarMensagemEntrada("Entrada registrada com sucesso!", "sucesso");
-
+    mostrarMensagemEntrada(`${quantidadeRegistrada} ${quantidadeRegistrada === 1 ? "entrada registrada" : "entradas registradas"} com sucesso!`, "sucesso");
     await carregarUltimasEntradas(true);
   } catch (erro) {
-    console.error("Erro ao registrar entrada:", erro);
-
+    console.error("Erro ao registrar entradas:", erro);
     mostrarMensagemEntrada("Não foi possível conectar ao servidor.");
   } finally {
-    botaoRegistrar.disabled = false;
-
-    botaoRegistrar.classList.remove("opacity-60", "cursor-not-allowed");
+    botaoAdicionarItemEntrada.disabled = false;
+    renderizarItensEntrada();
   }
 });
+
+renderizarItensEntrada();
 
 // HISTÓRICO DAS ÚLTIMAS ENTRADAS
 // Encontra a data em formatos comuns de movimentação
