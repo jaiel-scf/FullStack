@@ -46,6 +46,20 @@ public class MovimentacaoController {
         return movimentacaoService.registrar(movimentacao);
     }
 
+    // Registra múltiplas entradas de estoque.
+    @PostMapping("/entradas/lote")
+    public List<Movimentacao> registrarEntradasEmLote(
+            @RequestBody List<Movimentacao> entradas,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        validarAdmin(jwt);
+        Number usuarioId = jwt.getClaim("id");
+        if (usuarioId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não identificado");
+        }
+        return movimentacaoService.registrarEntradasEmLote(entradas, usuarioId.longValue());
+    }
+
     // Lista as requisições permitidas para o usuário logado
     @GetMapping("/requisicoes")
     public List<Movimentacao> listarRequisicoes(
@@ -113,6 +127,9 @@ public class MovimentacaoController {
     // Verifica se o usuário é administrador
     private void validarAdmin(Jwt jwt) {
 
+        if (jwt == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não autenticado");
+        }
         String perfil = jwt.getClaimAsString("perfil");
 
         if (!"admin".equals(perfil)) {
