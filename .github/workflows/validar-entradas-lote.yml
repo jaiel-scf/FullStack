@@ -18,7 +18,7 @@ jobs:
           cache: maven
           cache-dependency-path: backend/pom.xml
       - name: Compilar e testar backend
-        run: ./mvnw -B -f pom.xml test
+        run: bash ./mvnw -B -f pom.xml test
         working-directory: backend
       - name: Verificar sintaxe JavaScript
         run: node --check frontend/js/entrada.js
