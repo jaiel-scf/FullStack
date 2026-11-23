@@ -56,6 +56,46 @@ public class MovimentacaoService {
         return movimentacoes;
     }
 
+    // Registra todas as entradas na mesma transação.
+    @Transactional
+    public List<Movimentacao> registrarEntradasEmLote(List<Movimentacao> entradas, Long usuarioId) {
+        if (usuarioId == null) {
+            throw new IllegalArgumentException("Usuário não identificado.");
+        }
+        if (entradas == null || entradas.isEmpty()) {
+            throw new IllegalArgumentException("Informe pelo menos um produto.");
+        }
+
+        Set<Long> ids = new HashSet<>();
+        for (Movimentacao entrada : entradas) {
+            if (entrada == null || entrada.getProdutoId() == null) {
+                throw new IllegalArgumentException("Todos os itens devem possuir um produto.");
+            }
+            if (!ids.add(entrada.getProdutoId())) {
+                throw new IllegalArgumentException("Existem produtos repetidos na lista.");
+            }
+            if (entrada.getQuantidade() == null || entrada.getQuantidade() <= 0) {
+                throw new IllegalArgumentException("A quantidade deve ser maior que zero.");
+            }
+            if (entrada.getValorUnitario() == null
+                    || entrada.getValorUnitario().compareTo(BigDecimal.ZERO) <= 0) {
+                throw new IllegalArgumentException("O custo unitário deve ser maior que zero.");
+            }
+        }
+
+        List<Movimentacao> ordenadas = new ArrayList<>(entradas);
+        ordenadas.sort((a, b) -> a.getProdutoId().compareTo(b.getProdutoId()));
+
+        List<Movimentacao> registradas = new ArrayList<>();
+        for (Movimentacao entrada : ordenadas) {
+            entrada.setId(null);
+            entrada.setUsuarioId(usuarioId);
+            entrada.setTipo("ENTRADA");
+            registradas.add(registrar(entrada));
+        }
+        return registradas;
+    }
+
     // Registra entrada ou saída
     @Transactional
     public Movimentacao registrar(Movimentacao movimentacao) {
