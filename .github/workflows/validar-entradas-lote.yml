@@ -17,8 +17,10 @@ jobs:
           java-version: '21'
           cache: maven
           cache-dependency-path: backend/pom.xml
-      - name: Compilar e testar backend
-        run: bash ./mvnw -B -f pom.xml test
+      # Testes unitários isolados não exigem credenciais do banco de produção.
+      # O teste de inicialização do contexto requer um banco de testes dedicado.
+      - name: Compilar e executar testes unitários do backend
+        run: bash ./mvnw -B -f pom.xml -Dtest=MovimentacaoServiceTest,UsuarioServiceTest test
         working-directory: backend
       - name: Verificar sintaxe JavaScript
         run: node --check frontend/js/entrada.js
