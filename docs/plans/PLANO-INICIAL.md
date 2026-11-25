@@ -1,6 +1,6 @@
 # Plano inicial — RF11: edição administrativa de usuários
 
-Status: aguardando aprovação humana.
+Status: aprovado pelo responsável em 25/11/2026; implementação iniciada.
 
 ## 1. Análise
 
@@ -48,4 +48,4 @@ JWT com perfil desatualizado, concorrência na alteração de administradores, c
 
 ## 6. Aprovação
 
-Aguardar revisão explícita deste plano pelo responsável antes de alterar código. Registrar eventuais mudanças de requisitos antes de implementar.
+Plano aprovado pelo responsável em 25/11/2026: “sim , vamos seguindo”. Registrar eventuais mudanças de requisitos antes de implementar.
