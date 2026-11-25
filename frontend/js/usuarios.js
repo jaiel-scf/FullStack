@@ -89,8 +89,8 @@ const USUARIOS_POR_PAGINA = 3;
 // Página selecionada
 let paginaAtualUsuarios = 1;
 
-// Lista completa dos usuários ativos
-let usuariosAtivos = [];
+// Lista completa dos usuários cadastrados
+let usuariosCadastrados = [];
 
 // Evita interpretar os dados dos usuários como HTML
 function escaparHTML(valor) {
@@ -196,7 +196,7 @@ formMeuPerfil.addEventListener("submit", async function (event) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ nome, email }),
+      body: JSON.stringify({ nome }),
     });
 
     const dados = await resposta.json();
@@ -276,11 +276,9 @@ async function carregarUsuarios(voltarPrimeiraPagina = false) {
       throw new Error("Lista de usuários inválida.");
     }
 
-    usuariosAtivos = usuarios.filter(function (usuario) {
-      return usuario.ativo;
-    });
+    usuariosCadastrados = usuarios;
 
-    usuariosAtivos.sort(function (a, b) {
+    usuariosCadastrados.sort(function (a, b) {
       return String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR", {
         sensitivity: "base",
       });
@@ -294,7 +292,7 @@ async function carregarUsuarios(voltarPrimeiraPagina = false) {
   } catch (erro) {
     console.error("Erro ao carregar usuários:", erro);
 
-    usuariosAtivos = [];
+    usuariosCadastrados = [];
 
     tabelaUsuarios.innerHTML = `
       <tr>
@@ -311,11 +309,11 @@ async function carregarUsuarios(voltarPrimeiraPagina = false) {
 function mostrarUsuarios() {
   tabelaUsuarios.innerHTML = "";
 
-  if (usuariosAtivos.length === 0) {
+  if (usuariosCadastrados.length === 0) {
     tabelaUsuarios.innerHTML = `
       <tr>
         <td colspan="5" class="px-6 py-8 text-center text-slate-500">
-          Nenhum usuário ativo encontrado.
+          Nenhum usuário cadastrado encontrado.
         </td>
       </tr>
     `;
@@ -324,7 +322,7 @@ function mostrarUsuarios() {
     return;
   }
 
-  const totalPaginas = Math.ceil(usuariosAtivos.length / USUARIOS_POR_PAGINA);
+  const totalPaginas = Math.ceil(usuariosCadastrados.length / USUARIOS_POR_PAGINA);
 
   if (paginaAtualUsuarios > totalPaginas) {
     paginaAtualUsuarios = totalPaginas;
@@ -338,7 +336,7 @@ function mostrarUsuarios() {
 
   const indiceFinal = indiceInicial + USUARIOS_POR_PAGINA;
 
-  const usuariosDaPagina = usuariosAtivos.slice(indiceInicial, indiceFinal);
+  const usuariosDaPagina = usuariosCadastrados.slice(indiceInicial, indiceFinal);
 
   usuariosDaPagina.forEach(function (usuario) {
     const linha = document.createElement("tr");
@@ -357,13 +355,15 @@ function mostrarUsuarios() {
           </span>
         `
       : `
-          <button
+          <button type="button" class="botaoEditarUsuario text-blue-600 hover:text-blue-800 font-medium mr-3"
+            data-id="${escaparHTML(usuario.id)}">Editar</button>
+          ${usuario.ativo ? `<button
             type="button"
             class="botaoExcluirUsuario text-red-600 hover:text-red-800 font-medium"
             data-id="${escaparHTML(usuario.id)}"
           >
             Excluir
-          </button>
+          </button>` : ""}
         `;
 
     linha.innerHTML = `
@@ -380,9 +380,9 @@ function mostrarUsuarios() {
       </td>
 
       <td class="px-6 py-4">
-        <span class="inline-flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1.5 rounded-full text-sm font-semibold">
-          <span class="w-2 h-2 rounded-full bg-green-500"></span>
-          Ativo
+        <span class="inline-flex items-center gap-2 ${usuario.ativo ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-600"} px-3 py-1.5 rounded-full text-sm font-semibold">
+          <span class="w-2 h-2 rounded-full ${usuario.ativo ? "bg-green-500" : "bg-slate-400"}"></span>
+          ${usuario.ativo ? "Ativo" : "Inativo"}
         </span>
       </td>
 
@@ -411,12 +411,12 @@ function mostrarPaginacaoUsuarios(totalPaginas) {
 
   const ultimoUsuario = Math.min(
     paginaAtualUsuarios * USUARIOS_POR_PAGINA,
-    usuariosAtivos.length,
+    usuariosCadastrados.length,
   );
 
   informacaoPaginacaoUsuarios.textContent =
     `Mostrando ${primeiroUsuario} a ${ultimoUsuario} ` +
-    `de ${usuariosAtivos.length} usuários ` +
+    `de ${usuariosCadastrados.length} usuários ` +
     `• Página ${paginaAtualUsuarios} de ${totalPaginas}`;
 
   criarBotaoPaginacaoUsuario(
@@ -490,7 +490,7 @@ function criarBotaoPaginacaoUsuario(
 }
 
 function mudarPaginaUsuarios(novaPagina) {
-  const totalPaginas = Math.ceil(usuariosAtivos.length / USUARIOS_POR_PAGINA);
+  const totalPaginas = Math.ceil(usuariosCadastrados.length / USUARIOS_POR_PAGINA);
 
   if (
     novaPagina < 1 ||
@@ -703,6 +703,99 @@ function sairDoSistema(event) {
 
 botaoSair.addEventListener("click", sairDoSistema);
 botaoSairMenu.addEventListener("click", sairDoSistema);
+
+
+ // Edição administrativa
+const modalEditarUsuario = document.getElementById("modalEditarUsuario");
+const formEditarUsuario = document.getElementById("formEditarUsuario");
+const mensagemEditarUsuario = document.getElementById("mensagemEditarUsuario");
+const salvarEditarUsuario = document.getElementById("salvarEditarUsuario");
+let usuarioParaEditar = null;
+let botaoEdicaoAnterior = null;
+
+function fecharModalEdicaoUsuario() {
+  if (salvarEditarUsuario.disabled) return;
+  modalEditarUsuario.classList.add("hidden");
+  usuarioParaEditar = null;
+  botaoEdicaoAnterior?.focus();
+}
+
+tabelaUsuarios.addEventListener("click", function (event) {
+  const botao = event.target.closest(".botaoEditarUsuario");
+  if (!botao || String(botao.dataset.id) === String(usuarioId)) return;
+  const usuario = usuariosCadastrados.find(u => String(u.id) === botao.dataset.id);
+  if (!usuario) return;
+  usuarioParaEditar = usuario.id;
+  botaoEdicaoAnterior = botao;
+  document.getElementById("editarNomeUsuario").value = usuario.nome || "";
+  document.getElementById("editarEmailUsuario").value = usuario.email || "";
+  document.getElementById("editarPerfilUsuario").value = usuario.perfil;
+  document.getElementById("editarSituacaoUsuario").value = String(Boolean(usuario.ativo));
+  mensagemEditarUsuario.textContent = "";
+  modalEditarUsuario.classList.remove("hidden");
+  document.getElementById("editarNomeUsuario").focus();
+});
+
+document.getElementById("fecharEditarUsuario").addEventListener("click", fecharModalEdicaoUsuario);
+document.getElementById("cancelarEditarUsuario").addEventListener("click", fecharModalEdicaoUsuario);
+modalEditarUsuario.addEventListener("click", event => {
+  if (event.target === modalEditarUsuario) fecharModalEdicaoUsuario();
+});
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && !modalEditarUsuario.classList.contains("hidden")) fecharModalEdicaoUsuario();
+});
+
+formEditarUsuario.addEventListener("submit", async function (event) {
+  event.preventDefault();
+  if (usuarioParaEditar === null || salvarEditarUsuario.disabled) return;
+  const nome = document.getElementById("editarNomeUsuario").value.trim();
+  const email = document.getElementById("editarEmailUsuario").value.trim().toLowerCase();
+  const perfil = document.getElementById("editarPerfilUsuario").value;
+  const ativo = document.getElementById("editarSituacaoUsuario").value === "true";
+  mensagemEditarUsuario.className = "text-sm text-red-600";
+  if (!nome || !email || !["admin", "usuario"].includes(perfil)) {
+    mensagemEditarUsuario.textContent = "Informe dados válidos.";
+    return;
+  }
+  salvarEditarUsuario.disabled = true;
+  salvarEditarUsuario.textContent = "Salvando...";
+  let sucesso = false;
+  try {
+    const resposta = await fetch(`${API_URL}/usuarios/${encodeURIComponent(usuarioParaEditar)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ nome, email, perfil, ativo }),
+    });
+    if (resposta.status === 401) {
+      sessionStorage.clear();
+      window.location.href = "login.html";
+      return;
+    }
+    if (!resposta.ok) {
+      const dados = await resposta.json().catch(() => ({}));
+      const mensagens = {
+        400: "Dados inválidos.",
+        403: "Você não tem permissão para esta alteração.",
+        404: "Usuário não encontrado.",
+        409: "E-mail já utilizado ou alteração incompatível com as regras de administração.",
+      };
+      throw new Error(dados.mensagem || mensagens[resposta.status] || "Não foi possível editar o usuário.");
+    }
+    sucesso = true;
+    mensagemUsuario.textContent = "Usuário atualizado com sucesso!";
+    mensagemUsuario.className = "text-sm mt-4 text-green-600";
+  } catch (erro) {
+    mensagemEditarUsuario.textContent = erro.message;
+  } finally {
+    salvarEditarUsuario.disabled = false;
+    salvarEditarUsuario.textContent = "Salvar alterações";
+  }
+  if (sucesso) {
+    fecharModalEdicaoUsuario();
+    await carregarUsuarios(false);
+  }
+});
+
 
 // CARREGAMENTO INICIAL DA TELA
 carregarUsuarios(true);

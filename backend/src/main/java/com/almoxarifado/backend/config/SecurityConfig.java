@@ -3,6 +3,11 @@ package com.almoxarifado.backend.config;
 
 import java.util.Base64;
 import java.util.List;
+import com.almoxarifado.backend.repository.UsuarioRepository;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -61,11 +66,32 @@ public class SecurityConfig {
 
         // Valida tokens JWT
         @Bean
-        public JwtDecoder jwtDecoder() {
+        public JwtDecoder jwtDecoder(UsuarioRepository usuarioRepository) {
 
-                return NimbusJwtDecoder
+                NimbusJwtDecoder decoder = NimbusJwtDecoder
                                 .withSecretKey(secretKey())
                                 .build();
+
+                decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
+                                JwtValidators.createDefaultWithIssuer("sia-backend"),
+                                jwt -> {
+                                        Object id = jwt.getClaims().get("id");
+                                        if (id instanceof Number numero
+                                                        && usuarioRepository.findById(numero.longValue())
+                                                                        .filter(usuario -> Boolean.TRUE.equals(usuario.getAtivo()))
+                                                                        .filter(usuario -> usuario.getPerfil() != null
+                                                                                        && usuario.getPerfil().equals(jwt.getClaimAsString("perfil")))
+                                                                        .filter(usuario -> usuario.getEmail() != null
+                                                                                        && usuario.getEmail().equals(jwt.getSubject()))
+                                                                        .isPresent()) {
+                                                return OAuth2TokenValidatorResult.success();
+                                        }
+
+                                        return OAuth2TokenValidatorResult.failure(new OAuth2Error(
+                                                        "invalid_token", "Sessão inválida. Realize um novo login.", null));
+                                }));
+
+                return decoder;
         }
 
         // Define as regras de acesso

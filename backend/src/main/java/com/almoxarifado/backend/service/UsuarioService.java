@@ -7,6 +7,9 @@ import com.almoxarifado.backend.repository.UsuarioRepository;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -247,11 +250,14 @@ public class UsuarioService {
         }
 
         // Cadastra ou reativa um usuário
+        @Transactional
         public Usuario cadastrarUsuario(
                         String nome,
                         String email,
                         String senha,
                         String perfil) {
+
+                usuarioRepository.bloquearUsuariosParaEdicao();
 
                 if (!"admin".equals(perfil)
                                 && !"usuario".equals(perfil)) {
@@ -306,13 +312,83 @@ public class UsuarioService {
                 return usuarioRepository.findAll();
         }
 
+        // Edita os dados administrativos sem alterar senha ou primeiro acesso.
+        @Transactional
+        public Usuario editarUsuario(Long id, Long administradorId, String nome,
+                        String email, String perfil, Boolean ativo) {
+
+                List<Usuario> usuarios = usuarioRepository.bloquearUsuariosParaEdicao();
+                validarAdministrador(usuarios, administradorId);
+
+                if (Objects.equals(id, administradorId)) {
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                                        "Não é permitido editar a própria conta por esta operação");
+                }
+
+                if (nome == null || nome.isBlank() || email == null
+                                || !email.trim().matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")
+                                || ativo == null
+                                || (!"admin".equals(perfil) && !"usuario".equals(perfil))) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                        "Informe nome, e-mail, perfil e situação válidos");
+                }
+
+                Usuario usuario = buscarUsuarioBloqueado(usuarios, id);
+                String emailTratado = email.trim().toLowerCase(Locale.ROOT);
+
+                if (usuarios.stream().anyMatch(u -> !Objects.equals(u.getId(), id)
+                                && emailTratado.equalsIgnoreCase(u.getEmail()))) {
+                        throw new ResponseStatusException(HttpStatus.CONFLICT,
+                                        "Já existe um usuário com este e-mail");
+                }
+
+                protegerUltimoAdministrador(usuarios, usuario, perfil, ativo);
+
+                if (!Objects.equals(usuario.getEmail(), emailTratado)
+                                || !Objects.equals(usuario.getAtivo(), ativo)) {
+                        usuario.setTokenRedefinicao(null);
+                        usuario.setTokenExpiraEm(null);
+                }
+
+                usuario.setNome(nome.trim());
+                usuario.setEmail(emailTratado);
+                usuario.setPerfil(perfil);
+                usuario.setAtivo(ativo);
+                return usuarioRepository.save(usuario);
+        }
+
+        private Usuario buscarUsuarioBloqueado(List<Usuario> usuarios, Long id) {
+                return usuarios.stream().filter(u -> Objects.equals(u.getId(), id))
+                                .findFirst().orElseThrow(() -> new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+        }
+
+        private void validarAdministrador(List<Usuario> usuarios, Long id) {
+                if (usuarios.stream().noneMatch(u -> Objects.equals(u.getId(), id)
+                                && Boolean.TRUE.equals(u.getAtivo()) && "admin".equals(u.getPerfil()))) {
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                                        "Operação restrita a administradores ativos");
+                }
+        }
+
+        private void protegerUltimoAdministrador(List<Usuario> usuarios, Usuario usuario,
+                        String novoPerfil, Boolean novoAtivo) {
+                if ("admin".equals(usuario.getPerfil()) && Boolean.TRUE.equals(usuario.getAtivo())
+                                && (!"admin".equals(novoPerfil) || !Boolean.TRUE.equals(novoAtivo))
+                                && usuarios.stream().noneMatch(u -> !Objects.equals(u.getId(), usuario.getId())
+                                                && "admin".equals(u.getPerfil()) && Boolean.TRUE.equals(u.getAtivo()))) {
+                        throw new ResponseStatusException(HttpStatus.CONFLICT,
+                                        "O sistema deve manter pelo menos um administrador ativo");
+                }
+        }
+
         // Inativa o usuário sem apagar seu histórico
+        @Transactional
         public void excluirUsuario(Long id) {
 
-                Usuario usuario = usuarioRepository.findById(id)
-                                .orElseThrow(() -> new ResponseStatusException(
-                                                HttpStatus.NOT_FOUND,
-                                                "Usuário não encontrado"));
+                List<Usuario> usuarios = usuarioRepository.bloquearUsuariosParaEdicao();
+                Usuario usuario = buscarUsuarioBloqueado(usuarios, id);
+                protegerUltimoAdministrador(usuarios, usuario, usuario.getPerfil(), false);
 
                 usuario.setAtivo(false);
 
