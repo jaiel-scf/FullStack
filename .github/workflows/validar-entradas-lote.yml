@@ -4,6 +4,10 @@ on:
     branches:
       - feature/backend-entradas-lote-render
       - feature/entradas-lote-integrada-main
+      - integracao-ia-render
+  pull_request:
+    branches:
+      - deploy/render-backend
   workflow_dispatch:
 jobs:
   validar:
@@ -20,7 +24,9 @@ jobs:
       # Testes unitários isolados não exigem credenciais do banco de produção.
       # O teste de inicialização do contexto requer um banco de testes dedicado.
       - name: Compilar e executar testes unitários do backend
-        run: bash ./mvnw -B -f pom.xml -Dtest=MovimentacaoServiceTest,UsuarioServiceTest test
+        run: bash ./mvnw -B -f pom.xml -Dtest=MovimentacaoServiceTest,UsuarioServiceTest,SecurityConfigTest package
         working-directory: backend
       - name: Verificar sintaxe JavaScript
-        run: node --check frontend/js/entrada.js
+        run: |
+          node --check frontend/js/entrada.js
+          node --check frontend/js/usuarios.js
