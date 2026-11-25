@@ -184,6 +184,29 @@ public class UsuarioController {
                 request.getNovaSenha());
     }
 
+    @PutMapping("/{id}")
+    public UsuarioResponse editar(
+            @PathVariable Long id,
+            @RequestBody EditarUsuarioRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        validarAdmin(jwt);
+
+        Number administradorId = jwt.getClaim("id");
+        if (administradorId == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED, "Usuário inválido");
+        }
+
+        Usuario usuario = usuarioService.editarUsuario(
+                id, administradorId.longValue(), request.nome(),
+                request.email(), request.perfil(), request.ativo());
+
+        return criarResponse(usuario);
+    }
+
+    public record EditarUsuarioRequest(String nome, String email, String perfil, Boolean ativo) {}
+
     // Inativa usuário
     @DeleteMapping("/{id}")
     public void excluir(
