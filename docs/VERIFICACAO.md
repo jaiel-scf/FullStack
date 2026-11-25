@@ -2,7 +2,7 @@
 
 Data: 25/11/2026
 
-Branch: `desenvolvimento-ia`
+Branches: `desenvolvimento-ia` (implementação), `integracao-ia-render` (integração), `main` (frontend e entrega), `deploy/render-backend` (backend publicado).
 
 ## Evidências de execução
 
@@ -22,12 +22,23 @@ SecurityConfigTest: JWT válido, usuário inativo, perfil alterado, email altera
 
 Os testes usam Mockito e chaves fictícias, sem conexão com o banco. O aviso de carregamento dinâmico do Mockito não impediu a execução.
 
+## Integração e publicação
+
+| Verificação | Resultado |
+|---|---|
+| GitHub Actions, execução 45703848039 | Sucesso: package, testes de movimentações, usuários e JWT, e sintaxe JavaScript da branch de integração |
+| PR #11 | Mesclado; backend publicado no Render, commit 173027a8994d68c6ee86b80d43b5310ec59c24ad, status Live |
+| PR #12 | Mesclado; frontend publicado no Render, commit b293b8ddd9099d15ea3021da3892a6ce7df9787b, status Live |
+| Teste funcional da edição de usuários | Sucesso informado pelo aluno após publicação em 25/11/2026; sem registro individual de cada cenário |
+
+Evidências: [GitHub Actions](https://github.com/jaiel-scf/FullStack/actions/runs/45703848039), [PR backend](https://github.com/jaiel-scf/FullStack/pull/11), [PR frontend](https://github.com/jaiel-scf/FullStack/pull/12), [SIA Web](https://sia-frontend-avz2.onrender.com).
+
 ## Pendências e limitações
 
-- Teste funcional da interface e integração HTTP/PostgreSQL ainda não executados.
+- Teste funcional da edição confirmado pelo aluno; não houve verificação independente de todos os cenários HTTP/PostgreSQL, regressão completa ou teste do Mobile. A inicialização local com Supabase falhou por configuração/autenticação; a validação foi realizada no ambiente publicado.
 - Teste geral BackendApplicationTests não executado por carregar o contexto com conexão potencial ao banco existente.
 - Concorrência e revogação definitiva de JWT ainda não comprovadas: restaurar os dados anteriores pode tornar um token não expirado novamente válido.
-- Nenhum deploy ou alteração de dados de produção realizado nesta etapa.
+- Deploys de frontend e backend concluídos; nenhuma migração de esquema ou alteração direta de registros pelo assistente. A correção final do formulário Meu Perfil foi posterior à execução de CI citada e não possui teste específico registrado.
 - A escolha acadêmica foi evoluir o SIA existente; a aceitação pelo professor não foi verificada.
 
 A aprovação dos testes unitários não equivale à aprovação integral do sistema.
