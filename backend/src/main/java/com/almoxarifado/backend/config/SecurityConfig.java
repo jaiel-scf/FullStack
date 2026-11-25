@@ -87,7 +87,8 @@ public class SecurityConfig {
 
                         boolean ativo = usuarioRepository.findById(usuarioId.longValue())
                                         .map(usuario -> Boolean.TRUE.equals(usuario.getAtivo())
-                                                        && usuario.getEmail().equals(token.getSubject()))
+                                                        && usuario.getEmail().equals(token.getSubject())
+                                                        && java.util.Objects.equals(usuario.getPerfil(), token.getClaimAsString("perfil")))
                                         .orElse(false);
 
                         return ativo
