@@ -196,7 +196,7 @@ formMeuPerfil.addEventListener("submit", async function (event) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ nome, email }),
+      body: JSON.stringify({ nome }),
     });
 
     const dados = await resposta.json();
